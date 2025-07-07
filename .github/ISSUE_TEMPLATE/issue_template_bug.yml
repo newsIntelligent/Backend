@@ -1,7 +1,7 @@
 name: "Bug Report"
 description: "버그 리포트"
 title: "Bug: 00 발생"
-labels: "🐛 bug"
+labels: "bug"
 body:
   - type: input
     attributes:
