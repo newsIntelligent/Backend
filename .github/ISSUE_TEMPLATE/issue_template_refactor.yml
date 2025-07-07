@@ -1,0 +1,42 @@
+name: "Refactor"
+description: "리팩터링 작업"
+title: "Refactor: 00 리팩터링"
+labels: "♻️ refactor"
+body:
+  - type: input
+    attributes:
+      label: "🧼 리팩터링 설명"
+      placeholder: "리팩터링의 목적이나 필요성을 간단히 설명해주세요."
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: "📋 할일"
+      description: "리팩터링 todo"
+      placeholder: |
+        - [ ] 앞에 적으면 체크리스트가 됩니다.
+        - [x] 적으면 완료 항목으로 표시됩니다.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: "📆 기한"
+      description: "예상 완료 날짜"
+      placeholder: "2025-01-01"
+    validations:
+      required: true
+
+  - type: dropdown
+    attributes:
+      label: "❗️ 우선"
+      options:
+        - "1순위"
+        - "2순위"
+        - "부가 항목"
+
+  - type: textarea
+    attributes:
+      label: "📝 메모"
+      placeholder: "참고 자료 링크나 부가적으로 필요한 자원이 있다면 메모하세요"
