@@ -1,7 +1,7 @@
 name: "Feature"
 description: "API 구현"
 title: "Feat: 00 구현"
-labels: "feature"
+labels: " feature"
 body:
   - type: input
     attributes:

@@ -1,7 +1,7 @@
 name: "Refactor"
 description: "리팩터링 작업"
 title: "Refactor: 00 리팩터링"
-labels: "refactor"
+labels: " refactor"
 body:
   - type: input
     attributes:
