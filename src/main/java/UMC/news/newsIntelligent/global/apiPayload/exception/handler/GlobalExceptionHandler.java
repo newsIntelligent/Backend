@@ -1,5 +1,9 @@
 package UMC.news.newsIntelligent.global.apiPayload.exception.handler;
 
+import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.BaseErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.global.apiPayload.exception;
 
+import UMC.news.newsIntelligent.global.apiPayload.code.error.BaseErrorCode;
 import lombok.Getter;
 
 @Getter

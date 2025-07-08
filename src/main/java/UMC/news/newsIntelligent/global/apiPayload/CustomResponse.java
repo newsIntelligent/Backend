@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.global.apiPayload;
 
+import UMC.news.newsIntelligent.global.apiPayload.code.error.BaseErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.BaseSuccessCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
