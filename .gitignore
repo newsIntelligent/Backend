@@ -35,3 +35,6 @@ out/
 
 # Spring Boot 설정 파일 무시
 src/main/resources/application.yml
+
+.env
+.env.*
