@@ -1,11 +1,17 @@
 package UMC.news.newsIntelligent.domain.notification;
 
+import UMC.news.newsIntelligent.domain.member.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,17 +28,16 @@ public class Notification extends BaseEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String title;
+	private String content;
 
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String newsSummary;
-
-	@Column(columnDefinition = "TEXT", nullable = false)
-	private String newsLink;
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private NotificationType notificationType;
 
 	@Column(nullable = false)
-	private String publishDate;
+	private Boolean isChecked;
 
-	@Column(nullable = false)
-	private String press;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false)
+	private Member member;
 }
