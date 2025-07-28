@@ -39,3 +39,6 @@ src/main/resources/application.yml
 .env
 .env.*
 env.properties
+
+*.pem
+Spring-Project.pem
