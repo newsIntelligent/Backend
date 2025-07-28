@@ -1,4 +1,15 @@
 services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    networks:
+      - spring-net
+
   mysql:
     image: mysql:8.0.36
     container_name: news-db
@@ -15,3 +26,6 @@ services:
 
 volumes:
   mysql_data:
+
+networks:
+  spring-net:
