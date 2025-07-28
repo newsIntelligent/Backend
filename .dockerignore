@@ -1,0 +1,16 @@
+# Gradle 캐시와 빌드 파일 제거
+.gradle
+**/.gradle
+build/*
+!build/libs/
+!build/libs/newsIntelligent-0.0.1-SNAPSHOT.jar
+
+# IDE 설정 제거
+.idea
+*.iml
+*.ipr
+*.iws
+
+# 기타 불필요 파일
+*.log
+.DS_Store
