@@ -10,10 +10,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class FeedbackCommandService {
+public class FeedbackCommandServiceImpl implements FeedbackCommandService {
 
     private final FeedbackRepository feedbackRepository;
 
+    @Override
     public void submitFeedback(FeedbackRequestDTO.FeedbackRequest request) {
         // 피드백 내용이 null이거나 빈칸인 경우 customException 발생
         if (request.content() == null || request.content().isBlank()) {
