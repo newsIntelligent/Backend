@@ -1,4 +1,7 @@
 package UMC.news.newsIntelligent.domain.feedback.repository;
 
-public interface FeedbackRepository {
+import UMC.news.newsIntelligent.domain.feedback.entity.Feedback;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 }
