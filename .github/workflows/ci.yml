@@ -1,4 +1,4 @@
-name: News Intelligent CI - Build & Test
+name: News Intelligent CI
 
 on:
   push:
@@ -16,20 +16,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # JDK 17 설치
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: 17
-
-      # Gradle 실행 권한 부여
-      - name: Grant execute permission for Gradle
-        run: chmod +x gradlew
-
-      # Gradle Build (without test)
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test
+#      # JDK 17 설치
+#      - name: Set up JDK 17
+#        uses: actions/setup-java@v3
+#        with:
+#          distribution: 'temurin'
+#          java-version: 17
+#
+#      # Gradle 실행 권한 부여
+#      - name: Grant execute permission for Gradle
+#        run: chmod +x gradlew
+#
+#      # Gradle Build (without test)
+#      - name: Build with Gradle
+#        run: ./gradlew clean build -x test
 
       # DockerHub 로그인
       - name: Login to DockerHub
