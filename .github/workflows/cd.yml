@@ -4,7 +4,7 @@ on:
   workflow_run:
     # CI 성공 시 수행
     workflows:
-      - "News Intelligent CI - Build & Test"
+      - "News Intelligent CI"
     types:
       - completed
 
