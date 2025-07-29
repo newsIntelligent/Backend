@@ -1,7 +1,25 @@
-FROM openjdk:17-jdk-slim
+# Build Stage
+FROM gradle:8.5-jdk17 AS builder
+
+ENV TZ=Asia/Seoul
 
 WORKDIR /app
 
-COPY build/libs/newsIntelligent-0.0.1-SNAPSHOT.jar app.jar
+# Gradle 빌드에 필요한 전체 프로젝트 복사
+COPY . .
 
+# 빌드 실행 (테스트 생략)
+RUN gradle clean build -x test
+
+# Run Stage
+FROM openjdk:17-jdk-slim
+
+ENV TZ=Asia/Seoul
+
+WORKDIR /app
+
+# 빌드 결과만 복사
+COPY --from=builder /app/build/libs/*.jar app.jar
+
+# 실행
 ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
