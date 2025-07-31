@@ -1,4 +1,4 @@
-package UMC.news.newsIntelligent.domain.member;
+package UMC.news.newsIntelligent.domain.member.entity;
 
 import java.util.ArrayList;
 import java.util.List;
