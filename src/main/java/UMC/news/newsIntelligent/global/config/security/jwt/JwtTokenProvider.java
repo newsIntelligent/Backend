@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Date;
 import java.util.Collections;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -29,11 +30,13 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
     }
 
-    /* OTP 코드 로그인용 (패스워드 x) */
+    /* OTP 코드 로그인용 accessToken 발급 (패스워드 방식 x) */
     public String generateAccessToken(Long id, String email, String role) {
         long expMs = jwtProperties.getExpiration().getAccess();
         Date now = new Date();
+
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setSubject(email)
                 .claim("id", id)
                 .claim("role", role)
@@ -74,5 +77,21 @@ public class JwtTokenProvider {
             return bearer.substring(Constants.TOKEN_PREFIX.length()); // "Bearer "
         }
         return null;
+    }
+
+    public String getJwtId(String token) {
+        return getClaims(token).getId();                    // jwtId
+    }
+
+    public Date getExpiration(String token) {
+        return getClaims(token).getExpiration();
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
