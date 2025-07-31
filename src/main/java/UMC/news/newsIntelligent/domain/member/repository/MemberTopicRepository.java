@@ -26,4 +26,17 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
             Pageable pageable
     );
 
+    @Query("""
+    SELECT mt.topic FROM MemberTopic mt
+    WHERE mt.member.id = :memberId
+      AND mt.isRead = true
+      AND mt.topic.id < :cursor
+    ORDER BY mt.topic.id DESC
+""")
+    Slice<Topic> getReadTopicsByMemberId(
+            @Param("memberId") Long memberId,
+            @Param("cursor") Long cursor,
+            Pageable pageable
+    );
+
 }
