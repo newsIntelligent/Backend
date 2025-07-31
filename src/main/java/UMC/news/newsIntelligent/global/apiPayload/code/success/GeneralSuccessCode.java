@@ -14,7 +14,9 @@ public enum GeneralSuccessCode implements BaseSuccessCode{
     /* --- 회원/인증 관련 --- */
     EMAIL_SENT          (HttpStatus.OK, "MEMBER200", "인증 메일을 발송했습니다."),
     SIGNUP_SUCCESS      (HttpStatus.OK, "MEMBER201", "회원가입이 완료되었습니다."),
-    LOGIN_SUCCESS       (HttpStatus.OK, "MEMBER202", "로그인에 성공했습니다.");
+    LOGIN_SUCCESS       (HttpStatus.OK, "MEMBER202", "로그인에 성공했습니다."),
+    LOGOUT_SUCCESS   (HttpStatus.OK, "MEMBER203", "로그아웃이 완료되었습니다."),
+    WITHDRAW_SUCCESS (HttpStatus.OK, "MEMBER204", "회원 탈퇴가 완료되었습니다.")
     ;
 
     private final HttpStatus status;
