@@ -1,6 +1,7 @@
 package UMC.news.newsIntelligent.domain.member.entity;
 
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+
 import lombok.*;
 
 @Entity
@@ -60,7 +62,6 @@ public class Member extends BaseEntity {
 		cascade = CascadeType.ALL,
 		orphanRemoval = true)
 	private List<MemberTopic> memberTopics = new ArrayList<>();
-
 
 	public static Member newMember(String email) {
 		return Member.builder()
