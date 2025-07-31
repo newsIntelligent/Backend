@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.domain.mail.entity;
 
+import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,10 +41,11 @@ public class OtpCode {
 
     public void validateUsable() {
         if (Boolean.TRUE.equals(verified))
-            throw new IllegalStateException("이미 사용된 코드 또는 링크");
+            throw new CustomException(GeneralErrorCode.OTP_WRONG);   // 불일치
         if (expiresAt.isBefore(LocalDateTime.now()))
-            throw new IllegalArgumentException("만료된 코드 또는 링크");
+            throw new CustomException(GeneralErrorCode.OTP_EXPIRED);   // 만료
     }
+
     public void markVerified() { this.verified = true; }
 
 }
