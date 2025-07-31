@@ -41,6 +41,27 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
                 .build();
     }
 
+    @Override
+    public MemberTopicResponseDTO.MemberTopicPreviewListResDTO getReadTopics(Long cursor, int size, Long memberId) {
+        cursor = normalizeCursor(cursor);
+        size = normalizeSize(size);
+
+        Pageable pageable = PageRequest.of(0, size);
+        Slice<Topic> topicSlice = memberTopicRepository.getReadTopicsByMemberId(memberId, cursor, pageable);
+
+        List<MemberTopicResponseDTO.MemberTopicPreviewResDTO> topicList = topicSlice.stream()
+                .map(MemberTopicConverter::toPreviewResDTO)
+                .toList();
+
+        Long nextCursor = topicSlice.hasNext() ? topicList.get(topicList.size() - 1).id() : null;
+
+        return MemberTopicResponseDTO.MemberTopicPreviewListResDTO.builder()
+                .cursor(nextCursor)
+                .hasNext(topicSlice.hasNext())
+                .topics(topicList)
+                .build();
+    }
+
     private Long normalizeCursor(Long cursor) {
         return (cursor == 0) ? Long.MAX_VALUE : cursor;
     }
@@ -49,5 +70,5 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
     private int normalizeSize(int size) {
         return (size < 1 || size > 10) ? 10 : size;
     }
-    }
+
 }

@@ -43,4 +43,24 @@ public class MemberTopicController {
 
         return CustomResponse.onSuccess(topicResDTO);
     }
+
+    @Operation(summary = "읽은 토픽 목록 리스트 조회 API by 서동혁", description = "읽은 토픽 목록 리스트 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "토픽 리스트 조회 성공")
+    })
+    @GetMapping("/read-topics")
+    public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getReadTopics(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") @Max(10) int size
+            // @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+
+        // 로그인 기능 구현 이후 memberId(1) 대신 매개변수로 principalDetails
+        MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
+                memberTopicQueryService.getReadTopics(cursor, size, 1L);
+
+        return CustomResponse.onSuccess(topicResDTO);
+    }
+
+
 }
