@@ -1,4 +1,4 @@
-package UMC.news.newsIntelligent.domain.topic;
+package UMC.news.newsIntelligent.domain.topic.entity;
 
 import java.time.LocalDateTime;
 

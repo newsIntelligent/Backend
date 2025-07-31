@@ -3,7 +3,7 @@ package UMC.news.newsIntelligent.domain.member.service;
 import UMC.news.newsIntelligent.domain.member.converter.MemberTopicConverter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
 import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
-import UMC.news.newsIntelligent.domain.topic.Topic;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +48,27 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
 
         Pageable pageable = PageRequest.of(0, size);
         Slice<Topic> topicSlice = memberTopicRepository.getReadTopicsByMemberId(memberId, cursor, pageable);
+
+        List<MemberTopicResponseDTO.MemberTopicPreviewResDTO> topicList = topicSlice.stream()
+                .map(MemberTopicConverter::toPreviewResDTO)
+                .toList();
+
+        Long nextCursor = topicSlice.hasNext() ? topicList.get(topicList.size() - 1).id() : null;
+
+        return MemberTopicResponseDTO.MemberTopicPreviewListResDTO.builder()
+                .cursor(nextCursor)
+                .hasNext(topicSlice.hasNext())
+                .topics(topicList)
+                .build();
+    }
+
+    @Override
+    public MemberTopicResponseDTO.MemberTopicPreviewListResDTO getSubscriptionTopics(Long cursor, int size, Long memberId) {
+        cursor = normalizeCursor(cursor);
+        size = normalizeSize(size);
+
+        Pageable pageable = PageRequest.of(0, size);
+        Slice<Topic> topicSlice = memberTopicRepository.getSubscriptionTopicsByMemberId(memberId, cursor, pageable);
 
         List<MemberTopicResponseDTO.MemberTopicPreviewResDTO> topicList = topicSlice.stream()
                 .map(MemberTopicConverter::toPreviewResDTO)
