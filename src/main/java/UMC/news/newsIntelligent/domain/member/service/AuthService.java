@@ -6,6 +6,8 @@ import UMC.news.newsIntelligent.domain.mail.service.MailService;
 import UMC.news.newsIntelligent.domain.member.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.dto.TokenResponseDto;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -71,7 +73,11 @@ public class AuthService {
     public TokenResponseDto loginByCode(String email, String code) {
         OtpCode otp = getOtp(email, LOGIN);
         otp.validateUsable();
-        if (!otp.getCode().equals(code)) throw new IllegalArgumentException("코드 불일치"); // 추후 커스텀 에러 추가 예정
+
+        // 코드 일치 여부 확인
+        if (!otp.getCode().equals(code)) {
+            throw new CustomException(GeneralErrorCode.OTP_WRONG);
+        }
         return completeLogin(otp);
     }
 

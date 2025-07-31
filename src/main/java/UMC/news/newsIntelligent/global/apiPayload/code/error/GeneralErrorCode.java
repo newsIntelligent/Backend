@@ -21,8 +21,11 @@ public enum GeneralErrorCode implements BaseErrorCode{
     // 유효성 검사
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "VALID400_0", "잘못된 파라미터 입니다."),
     // 커서 에러
-    CURSOR_INVALID(HttpStatus.BAD_REQUEST, "CURSOR400", "커서가 유효하지 않습니다.")
-    ;
+    CURSOR_INVALID(HttpStatus.BAD_REQUEST, "CURSOR400", "커서가 유효하지 않습니다."),
+
+    /* --- 회원/인증 관련 에러 ---*/
+    OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
+    OTP_EXPIRED    ( HttpStatus.BAD_REQUEST, "AUTH402",  "인증번호가 만료되었습니다."),;
 
     // 필요한 필드값 선언
     private final HttpStatus status;
