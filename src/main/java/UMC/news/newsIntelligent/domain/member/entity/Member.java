@@ -1,4 +1,4 @@
-package UMC.news.newsIntelligent.domain.member;
+package UMC.news.newsIntelligent.domain.member.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -74,5 +74,12 @@ public class Member extends BaseEntity {
 
 	public void updateLastLogin() {
 		this.lastLoginAt = LocalDateTime.now();
+	}
+
+	public void deactivate() {
+		this.isDeactivated = true;
+	}
+	public boolean isDeactivated() {
+		return Boolean.TRUE.equals(isDeactivated);
 	}
 }
