@@ -3,7 +3,7 @@ package UMC.news.newsIntelligent.domain.member.service;
 import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
 import UMC.news.newsIntelligent.domain.mail.repository.OtpCodeRepository;
 import UMC.news.newsIntelligent.domain.mail.service.MailService;
-import UMC.news.newsIntelligent.domain.member.Member;
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.dto.TokenResponseDto;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
