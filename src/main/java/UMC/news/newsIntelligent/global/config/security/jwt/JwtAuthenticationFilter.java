@@ -16,34 +16,17 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwt;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+                                    FilterChain chain) throws ServletException, IOException {
 
-        try {
-            String token = resolveToken(request);
-            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        } catch (Exception e) {
-            System.out.println("[JWT ERROR] " + e.getMessage());
-            // 예외를 던지지 않고 그냥 필터 체인을 계속 진행
+        String token = JwtTokenProvider.resolveToken(request);
+        if (token != null && jwt.validate(token)) {
+            SecurityContextHolder.getContext().setAuthentication(jwt.getAuthentication(token));
         }
-
-        filterChain.doFilter(request, response); // 항상 호출
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(Constants.AUTH_HEADER);
-
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constants.TOKEN_PREFIX)) {
-            return bearerToken.substring(Constants.TOKEN_PREFIX.length());
-        }
-        return null;
+        chain.doFilter(request, response);
     }
 }
