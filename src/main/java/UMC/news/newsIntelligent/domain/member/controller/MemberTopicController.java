@@ -29,7 +29,7 @@ public class MemberTopicController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 조회 성공")
     })
-    @GetMapping("/read-topics")
+    @GetMapping("/read-topic")
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> searchReadTopics(
             @RequestParam String keyword,
             @RequestParam(required = false) Long cursor,
