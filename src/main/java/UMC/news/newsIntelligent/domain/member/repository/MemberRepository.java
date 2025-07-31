@@ -1,6 +1,6 @@
 package UMC.news.newsIntelligent.domain.member.repository;
 
-import UMC.news.newsIntelligent.domain.member.Member;
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
