@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.member.service;
 
+import UMC.news.newsIntelligent.domain.member.converter.MemberInfoConverter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberInfoDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
@@ -19,6 +20,6 @@ public class MemberQueryService {
     public MemberInfoDto getInfo(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
-        return MemberInfoDto.from(member);
+        return MemberInfoConverter.toDto(member);
     }
 }
