@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Date;
 import java.util.Collections;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -25,28 +26,29 @@ public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
 
-    private Key getSigningKey() {
+    private Key signingKey() {
         return Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
     }
 
-    public String generateToken(Authentication authentication) {
-        String email = authentication.getName();
+    /* OTP 코드 로그인용 accessToken 발급 (패스워드 방식 x) */
+    public String generateAccessToken(Long id, String email, String role) {
+        long expMs = jwtProperties.getExpiration().getAccess();
+        Date now = new Date();
 
         return Jwts.builder()
+                .setId(UUID.randomUUID().toString())
                 .setSubject(email)
-                .claim("role", authentication.getAuthorities().iterator().next().getAuthority())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration().getAccess()))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claim("id", id)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + expMs))
+                .signWith(signingKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validate(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(signingKey()).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;
@@ -55,32 +57,41 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(signingKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
         String email = claims.getSubject();
-        String role = claims.get("role", String.class);
+        String role  = claims.get("role", String.class);
+        if (role == null) role = "ROLE_USER";
 
-        User principal = new User(email, "", Collections.singleton(() -> role));
+        String finalRole = role;
+        User principal = new User(email, "", Collections.singleton(() -> finalRole));
         return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
     }
 
     public static String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(Constants.AUTH_HEADER);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(Constants.TOKEN_PREFIX)) {
-            return bearerToken.substring(Constants.TOKEN_PREFIX.length());
+        String bearer = request.getHeader(Constants.AUTH_HEADER);      // e.g. "Authorization"
+        if (StringUtils.hasText(bearer) && bearer.startsWith(Constants.TOKEN_PREFIX)) {
+            return bearer.substring(Constants.TOKEN_PREFIX.length()); // "Bearer "
         }
         return null;
     }
 
-    public Authentication extractAuthentication(HttpServletRequest request){
-        String accessToken = resolveToken(request);
-        if(accessToken == null || !validateToken(accessToken)) {
-            //throw new MemberHandler(ErrorStatus.INVALID_TOKEN);
-        }
-        return getAuthentication(accessToken);
+    public String getJwtId(String token) {
+        return getClaims(token).getId();                    // jwtId
     }
 
+    public Date getExpiration(String token) {
+        return getClaims(token).getExpiration();
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(signingKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
 }

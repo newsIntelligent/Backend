@@ -1,6 +1,6 @@
 package UMC.news.newsIntelligent.domain.feedback.entity;
 
-import UMC.news.newsIntelligent.domain.member.Member;
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
