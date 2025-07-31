@@ -1,6 +1,6 @@
 package UMC.news.newsIntelligent.domain.topic.service.query;
 
-import UMC.news.newsIntelligent.domain.topic.Topic;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import UMC.news.newsIntelligent.domain.topic.converter.TopicConverter;
 import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.domain.topic.repository.TopicRepository;

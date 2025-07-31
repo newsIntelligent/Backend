@@ -62,5 +62,22 @@ public class MemberTopicController {
         return CustomResponse.onSuccess(topicResDTO);
     }
 
+    @Operation(summary = "구독 토픽 리스트 조회 API by 서동혁", description = "구독 토픽 리스트 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "구독 토픽 리스트 조회 성공")
+    })
+    @GetMapping("/subscriptions")
+    public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getSubscriptionTopics(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") @Max(10) int size
+            // @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+
+        // 로그인 기능 구현 이후 memberId(1) 대신 매개변수로 principalDetails
+        MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
+                memberTopicQueryService.getSubscriptionTopics(cursor, size, 1L);
+
+        return CustomResponse.onSuccess(topicResDTO);
+    }
 
 }

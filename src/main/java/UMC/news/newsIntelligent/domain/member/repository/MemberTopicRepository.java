@@ -1,7 +1,7 @@
 package UMC.news.newsIntelligent.domain.member.repository;
 
 import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
-import UMC.news.newsIntelligent.domain.topic.Topic;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,10 +33,15 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
       AND mt.topic.id < :cursor
     ORDER BY mt.topic.id DESC
 """)
-    Slice<Topic> getReadTopicsByMemberId(
-            @Param("memberId") Long memberId,
-            @Param("cursor") Long cursor,
-            Pageable pageable
-    );
+    Slice<Topic> getReadTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
+
+    @Query("""
+    SELECT mt.topic FROM MemberTopic mt
+    WHERE mt.member.id = :memberId
+      AND mt.isSubscribe = true
+      AND mt.topic.id < :cursor
+    ORDER BY mt.topic.id DESC
+""")
+    Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
 }

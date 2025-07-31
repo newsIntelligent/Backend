@@ -1,6 +1,6 @@
 package UMC.news.newsIntelligent.domain.topic.converter;
 
-import UMC.news.newsIntelligent.domain.topic.Topic;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 
 public class TopicConverter {
