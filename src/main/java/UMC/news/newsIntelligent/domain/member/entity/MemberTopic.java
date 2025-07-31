@@ -1,4 +1,4 @@
-package UMC.news.newsIntelligent.domain.member;
+package UMC.news.newsIntelligent.domain.member.entity;
 
 import UMC.news.newsIntelligent.domain.topic.Topic;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
@@ -11,9 +11,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 @Entity
 @Table(name = "member_topic")
+@Getter
 public class MemberTopic extends BaseEntity {
 
 	@Id
