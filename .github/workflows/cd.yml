@@ -28,5 +28,5 @@ jobs:
           script: |
             cd ~/${{ secrets.REPOSITORY_PATH }}
             export IMAGE_TAG=$IMAGE_TAG
-            docker compose pull
-            docker compose up -d --force-recreate
+            docker-compose pull
+            docker-compose up -d --force-recreate
