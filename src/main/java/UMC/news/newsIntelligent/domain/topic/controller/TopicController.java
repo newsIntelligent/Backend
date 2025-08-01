@@ -15,9 +15,11 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,10 +54,30 @@ public class TopicController {
         + "<p>토픽 조회 후 읽지 않은 토픽(isRead=false)일 경우만 호출합니다.")
     @PatchMapping("/{topicId}/read")
     public CustomResponse<Void> markTopicRead(
-        @PathVariable Long topicId,
-        @AuthenticationPrincipal PrincipalUserDetails principal
+        @AuthenticationPrincipal PrincipalUserDetails principal,
+        @PathVariable Long topicId
     ) {
         memberTopicCommandService.markRead(principal.getMemberId(), topicId);
+        return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+    }
+
+    @Operation(summary = "토픽 구독 요청 API", description = "<p>회원이 특정 토픽을 구독합니다.")
+    @PostMapping("/{topicId}/subscribe")
+    public CustomResponse<Void> subscribeTopic(
+        @AuthenticationPrincipal PrincipalUserDetails principal,
+        @PathVariable Long topicId
+    ) {
+        memberTopicCommandService.subscribe(principal.getMemberId(), topicId);
+        return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+    }
+
+    @Operation(summary = "토픽 구독 취소 API", description = "<p>회원이 특정 토픽 구독을 취소합니다.")
+    @DeleteMapping("/{topicId}/unsubscribe")
+    public CustomResponse<Void> unsubscribeTopic(
+        @AuthenticationPrincipal PrincipalUserDetails principal,
+        @PathVariable Long topicId
+    ) {
+        memberTopicCommandService.unsubscribe(principal.getMemberId(), topicId);
         return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
     }
 

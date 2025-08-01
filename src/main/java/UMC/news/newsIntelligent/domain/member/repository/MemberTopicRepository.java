@@ -47,4 +47,6 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
     Optional<MemberTopic> findByMemberIdAndTopicId(Long memberId, Long topicId);
+    boolean existsByMemberIdAndTopicId(Long memberId, Long topicId);
+    void deleteByMemberIdAndTopicId(Long memberId, Long topicId);
 }
