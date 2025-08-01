@@ -16,7 +16,11 @@ public enum GeneralSuccessCode implements BaseSuccessCode{
     SIGNUP_SUCCESS      (HttpStatus.OK, "MEMBER201", "회원가입이 완료되었습니다."),
     LOGIN_SUCCESS       (HttpStatus.OK, "MEMBER202", "로그인에 성공했습니다."),
     LOGOUT_SUCCESS   (HttpStatus.OK, "MEMBER203", "로그아웃이 완료되었습니다."),
-    WITHDRAW_SUCCESS (HttpStatus.OK, "MEMBER204", "회원 탈퇴가 완료되었습니다.")
+    WITHDRAW_SUCCESS (HttpStatus.OK, "MEMBER204", "회원 탈퇴가 완료되었습니다."),
+
+    // 토픽
+    GET_TOPIC(HttpStatus.OK, "TOPIC200", "토픽 상세 페이지 조회가 완료되었습니다."),
+    GET_NEWS(HttpStatus.OK, "NEWS200", "토픽 출처 기사 목록 조회가 완료되었습니다.")
     ;
 
     private final HttpStatus status;
