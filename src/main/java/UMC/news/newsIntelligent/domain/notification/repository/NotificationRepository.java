@@ -3,8 +3,10 @@ package UMC.news.newsIntelligent.domain.notification.repository;
 import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -45,4 +47,10 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 		@Param("id") Long id,
 		@Param("limit") int limit
 	);
+
+	Optional<Notification> findByIdAndMemberId(Long id, Long memberId);
+
+	@Modifying
+	@Query("UPDATE Notification n SET n.isChecked = true WHERE n.member.id = :memberId AND n.isChecked = false")
+	void markAllAsChecked(@Param("memberId") Long memberId);
 }

@@ -40,4 +40,8 @@ public class Notification extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
+
+	public void setChecked(Boolean checked) {
+		isChecked = checked;
+	}
 }
