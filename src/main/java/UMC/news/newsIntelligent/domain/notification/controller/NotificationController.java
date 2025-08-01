@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.notification.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.service.NotificationService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
@@ -28,10 +30,11 @@ public class NotificationController {
 			+ "<p>커서 페이징 처리하였습니다.")
 	@GetMapping
 	public CustomResponse<NotificationResponse.NotificationCursorDto> getNotifications(
+		@AuthenticationPrincipal Member member,
 		@RequestParam(required = false) String cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		Long memberId = 0L;
+		Long memberId = member.getId();
 		NotificationResponse.NotificationCursorDto body =
 			notificationService.getNotifications(memberId, cursor, size);
 
@@ -42,9 +45,10 @@ public class NotificationController {
 		description = "<p>홈 화면 알림 목록에서 하나의 알림에 대한 읽음 처리를 합니다.")
 	@PatchMapping("/{notificationId}/check")
 	public CustomResponse<Void> markAsRead(
+		@AuthenticationPrincipal Member member,
 		@PathVariable Long notificationId
 	) {
-		Long memberId = 0L;
+		Long memberId = member.getId();
 		notificationService.markAsRead(memberId, notificationId);
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
@@ -52,8 +56,10 @@ public class NotificationController {
 	@Operation(summary = "모든 알림 읽음 처리 API",
 		description = "<p>홈 화면 알림 목록에서 알림 모두 읽기 처리를 할 경우 호출됩니다.")
 	@PatchMapping("/check")
-	public CustomResponse<Void> markAllAsRead() {
-		Long memberId = 0L;
+	public CustomResponse<Void> markAllAsRead(
+		@AuthenticationPrincipal Member member
+	) {
+		Long memberId = member.getId();
 		notificationService.markAllAsRead(memberId);
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
