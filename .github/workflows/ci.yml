@@ -35,7 +35,7 @@ jobs:
 
       # latest tag (develop branch)
       - name: Push :latest
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/develop')
+        if: github.ref == 'refs/heads/develop'   # push 이벤트에서 develop 일 때만
         run: |
           docker tag $REGISTRY/$IMAGE:$TAG $REGISTRY/$IMAGE:latest
           docker push $REGISTRY/$IMAGE:latest
