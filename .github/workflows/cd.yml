@@ -17,13 +17,16 @@ jobs:
       # EC2에 배포
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
+        env:
+          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
         with:
           host: ${{secrets.EC2_SERVER_IP}}
           username: ${{secrets.EC2_USERNAME}}
           key: ${{secrets.EC2_PRIVATE_KEY}}
+          envs: IMAGE_TAG
 
           script: |
-            cd ~/${{secrets.REPOSITORY_PATH}}
-            docker-compose down --remove-orphans
-            docker pull ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPOSITORY}}:latest
-            docker-compose up -d
+            cd ~/${{ secrets.REPOSITORY_PATH }}
+            export IMAGE_TAG=$IMAGE_TAG
+            docker compose pull
+            docker compose up -d --force-recreate
