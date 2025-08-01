@@ -24,4 +24,16 @@ public class TopicResponseDTO {
             Boolean hasNext,
             List<TopicPreviewResDTO> topics
     ) {}
+
+    @Builder
+    public record TopicDetailsResDTO(
+            Long id,
+            String topicName,
+            String aiSummary,
+            String imageUrl,
+//            boolean idSub,
+            LocalDateTime summaryTime
+//            LocalDateTime createdAt,
+//            LocalDateTime updatedAt
+    ) {}
 }
