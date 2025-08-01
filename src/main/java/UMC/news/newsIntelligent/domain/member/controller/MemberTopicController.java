@@ -1,6 +1,7 @@
 package UMC.news.newsIntelligent.domain.member.controller;
 
 import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.service.MemberTopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,13 +35,12 @@ public class MemberTopicController {
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> searchReadTopics(
             @RequestParam String keyword,
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") @Max(10) int size
-            // @AuthenticationPrincipal PrincipalDetails principalDetails
+            @RequestParam(defaultValue = "10") @Max(10) int size,
+            @AuthenticationPrincipal Member member
     ) {
 
-        // 로그인 기능 구현 이후 memberId(1) 대신 매개변수로 principalDetails
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.searchReadTopics(keyword, cursor, size, 1L);
+                memberTopicQueryService.searchReadTopics(keyword, cursor, size, member.getId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
@@ -51,13 +52,12 @@ public class MemberTopicController {
     @GetMapping("/read-topics")
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getReadTopics(
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") @Max(10) int size
-            // @AuthenticationPrincipal PrincipalDetails principalDetails
+            @RequestParam(defaultValue = "10") @Max(10) int size,
+            @AuthenticationPrincipal Member member
     ) {
 
-        // 로그인 기능 구현 이후 memberId(1) 대신 매개변수로 principalDetails
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getReadTopics(cursor, size, 1L);
+                memberTopicQueryService.getReadTopics(cursor, size, member.getId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
@@ -69,13 +69,12 @@ public class MemberTopicController {
     @GetMapping("/subscriptions")
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getSubscriptionTopics(
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") @Max(10) int size
-            // @AuthenticationPrincipal PrincipalDetails principalDetails
+            @RequestParam(defaultValue = "10") @Max(10) int size,
+            @AuthenticationPrincipal Member member
     ) {
 
-        // 로그인 기능 구현 이후 memberId(1) 대신 매개변수로 principalDetails
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getSubscriptionTopics(cursor, size, 1L);
+                memberTopicQueryService.getSubscriptionTopics(cursor, size, member.getId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
