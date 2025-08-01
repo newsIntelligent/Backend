@@ -2,7 +2,6 @@ name: News Intelligent CI
 
 on:
   push:
-  pull_request:
     branches:
       - develop
 
@@ -10,6 +9,11 @@ jobs:
   build:
     # ubuntu 버전 지정
     runs-on: ubuntu-22.04
+
+    env:
+      REGISTRY: ${{secrets.DOCKERHUB_USERNAME}}
+      IMAGE: ${{secrets.DOCKERHUB_REPOSITORY}}
+      TAG: ${{github.sha}}
 
     steps:
       # GitHub 레포지토리 checkout
@@ -24,7 +28,14 @@ jobs:
           password: ${{secrets.DOCKERHUB_ACCESS_TOKEN}}
 
       # Docker 이미지 빌드 및 푸시
-      - name: Build and Push Docker image
+      - name: Build & Push Docker image
         run: |
-          docker build -t ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPOSITORY}}:latest .
-          docker push ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPOSITORY}}:latest
+          docker build --pull --no-cache -t $REGISTRY/$IMAGE:$TAG .
+          docker push $REGISTRY/$IMAGE:$TAG
+
+      # latest tag (develop branch)
+      - name: Push :latest
+        if: github.ref == 'refs/heads/develop'   # push 이벤트에서 develop 일 때만
+        run: |
+          docker tag $REGISTRY/$IMAGE:$TAG $REGISTRY/$IMAGE:latest
+          docker push $REGISTRY/$IMAGE:latest

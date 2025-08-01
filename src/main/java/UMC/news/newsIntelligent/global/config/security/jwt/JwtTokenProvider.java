@@ -2,6 +2,7 @@ package UMC.news.newsIntelligent.global.config.security.jwt;
 
 import UMC.news.newsIntelligent.global.config.properties.Constants;
 import UMC.news.newsIntelligent.global.config.properties.JwtProperties;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -62,13 +63,18 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
+        Long id = ((Number) claims.get("id")).longValue();
         String email = claims.getSubject();
-        String role  = claims.get("role", String.class);
-        if (role == null) role = "ROLE_USER";
+        String role  = claims.getOrDefault("role", "ROLE_USER").toString();
 
-        String finalRole = role;
-        User principal = new User(email, "", Collections.singleton(() -> finalRole));
-        return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+        PrincipalUserDetails principal = new PrincipalUserDetails(
+                id,
+                email,
+                Collections.singleton(() -> role)
+        );
+
+        return new UsernamePasswordAuthenticationToken(
+                principal, token, principal.getAuthorities());
     }
 
     public static String resolveToken(HttpServletRequest request) {

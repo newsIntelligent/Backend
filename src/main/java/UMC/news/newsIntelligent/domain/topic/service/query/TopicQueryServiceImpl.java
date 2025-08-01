@@ -32,7 +32,9 @@ public class TopicQueryServiceImpl implements TopicQueryService {
                 .map(TopicConverter::toPreviewResDTO)
                 .toList();
 
-        Long nextCursor = topicSlice.hasNext() ? topicList.get(topicList.size() - 1).id() : null;
+        Long nextCursor = (topicSlice.hasNext() && !topicList.isEmpty())
+                ? topicList.get(topicList.size() - 1).id()
+                : null;
 
         return TopicResponseDTO.TopicPreviewListResDTO.builder()
                 .cursor(nextCursor)
@@ -42,7 +44,7 @@ public class TopicQueryServiceImpl implements TopicQueryService {
     }
 
     private Long normalizeCursor(Long cursor) {
-        return (cursor == 0) ? Long.MAX_VALUE : cursor;
+        return (cursor == null || cursor == 0) ? Long.MAX_VALUE : cursor;
     }
 
     // 요청 사이즈가 1보다 작으면 기본값 10, 10보다 크면 최대값 10으로 제한

@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/members")
+@RequiredArgsConstructor
 @Tag(name="회원 관련 API", description = "회원 정보 조회/수정")
 public class MemberController {
     private final MemberQueryService memberQueryService;
