@@ -11,18 +11,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/topics")
 @RequiredArgsConstructor
-@Validated
-@Tag(name = "토픽 관련 API", description = "토픽 조회")
+@Tag(name = "토픽 컨트롤러", description = "토픽과 관련된 API들을 관리하는 컨트롤러")
 public class TopicController {
 
     private final TopicQueryService topicQueryService;
 
-    /* --- 토픽 조회 --- */
-    @Operation(summary = "토픽 조회", description = "토픽을 조회하는 API입니다.")
+    @Operation(summary = "토픽 조회 API by 서동혁", description = "토픽 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 조회 성공")
     })

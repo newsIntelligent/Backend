@@ -13,14 +13,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/topic")
-@Tag(name = "토픽 뉴스 컨트롤러", description = "토픽 - 출처 기사를 관리하는 컨트롤러")
+@Tag(name = "토픽 상세 페이지 - 기사 출처 관련 API", description = "출처 기사 조회")
 public class NewsController {
 
     private final NewsService newsService;
 
-
-
-    @Operation(summary = "토픽 상세 페이지 - 출처 기사 목록 조회 API by 신윤진", description = "주제 생성에 사용된 출처 기사 목록을 반환합니다. ")
+    @Operation(summary = "토픽 상세 페이지 - 출처 기사 목록 조회 API by 신윤진", description = "주제 생성에 사용된 출처 기사 목록을 반환합니다.")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토픽 출처 기사 목록 조회 성공")
     })
