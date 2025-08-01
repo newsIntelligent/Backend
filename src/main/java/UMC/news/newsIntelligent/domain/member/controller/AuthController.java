@@ -24,8 +24,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/members")
+@RequiredArgsConstructor
 @Tag(name="사용자 및 인증 관련 API", description = "사용자 인증 및 가입/로그인/로그아웃/탈퇴")
 public class AuthController {
 
