@@ -74,7 +74,9 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
                 .map(MemberTopicConverter::toPreviewResDTO)
                 .toList();
 
-        Long nextCursor = topicSlice.hasNext() ? topicList.get(topicList.size() - 1).id() : null;
+        Long nextCursor = (topicSlice.hasNext() && !topicList.isEmpty())
+                ? topicList.get(topicList.size() - 1).id()
+                : null;
 
         return MemberTopicResponseDTO.MemberTopicPreviewListResDTO.builder()
                 .cursor(nextCursor)
@@ -84,7 +86,7 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
     }
 
     private Long normalizeCursor(Long cursor) {
-        return (cursor == 0) ? Long.MAX_VALUE : cursor;
+        return (cursor == null || cursor == 0) ? Long.MAX_VALUE : cursor;
     }
 
     // 요청 사이즈가 1보다 작으면 기본값 10, 10보다 크면 최대값 10으로 제한
