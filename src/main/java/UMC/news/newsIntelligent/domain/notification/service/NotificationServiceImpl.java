@@ -59,4 +59,19 @@ public class NotificationServiceImpl implements NotificationService {
 
 		return NotificationResponse.NotificationCursorDto.of(page, nextCursor, hasNext);
 	}
+
+	@Override
+	@Transactional
+	public void markAsRead(Long memberId, Long notificationId) {
+		Notification n = notificationRepository
+			.findByIdAndMemberId(notificationId, memberId)
+			.orElseThrow(() -> new CustomException(GeneralErrorCode.NOTIFICATION_NOT_FOUND));
+		n.setChecked(true);
+	}
+
+	@Override
+	@Transactional
+	public void markAllAsRead(Long memberId) {
+		notificationRepository.markAllAsChecked(memberId);
+	}
 }
