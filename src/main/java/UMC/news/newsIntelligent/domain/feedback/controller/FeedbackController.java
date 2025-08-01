@@ -16,12 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "피드백 컨트롤러", description = "피드백 관련 API")
+@Tag(name = "피드백 API", description = "피드백 작성")
 public class FeedbackController {
 
     private final FeedbackCommandService feedbackCommandService;
 
-    @Operation(summary = "피드백 작성", description = "사용자가 불편함을 느끼는 피드백을 받는 API")
+    /* --- 피드백 작성 --- */
+    @Operation(summary = "피드백 작성", description = "사용자가 불편함을 느끼는 피드백을 받는 API입니다.")
     @PostMapping("/feedbacks")
     public CustomResponse<?> submitFeedback(@RequestBody FeedbackRequestDTO.FeedbackRequest request) {
         try {

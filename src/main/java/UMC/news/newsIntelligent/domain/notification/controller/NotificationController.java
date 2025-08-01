@@ -20,13 +20,13 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/notification")
 @RequiredArgsConstructor
-@Tag(name = "사용자 알림 관련 API")
+@Tag(name = "사용자 알림 관련 API", description = "알림 조회 및 읽음 처리")
 public class NotificationController {
 
 	private final NotificationService notificationService;
 
-	@Operation(summary = "알림 목록 조회 API",
-		description = "<p>구독한 토픽, 읽은 토픽에 대한 홈화면 알림 목록입니다."
+	@Operation(summary = "알림 목록 조회",
+		description = "<p>구독한 토픽, 읽은 토픽에 대한 홈화면 알림 목록을 조회하는 API입니다."
 			+ "<p>커서 페이징 처리하였습니다.")
 	@GetMapping
 	public CustomResponse<NotificationResponse.NotificationCursorDto> getNotifications(
@@ -41,8 +41,8 @@ public class NotificationController {
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, body);
 	}
 
-	@Operation(summary = "단건 알림 읽음 처리 API",
-		description = "<p>홈 화면 알림 목록에서 하나의 알림에 대한 읽음 처리를 합니다.")
+	@Operation(summary = "단건 알림 읽음 처리",
+		description = "홈 화면 알림 목록에서 하나의 알림에 대한 읽음 처리를 하는 API입니다.")
 	@PatchMapping("/{notificationId}/check")
 	public CustomResponse<Void> markAsRead(
 		@AuthenticationPrincipal Member member,
@@ -53,8 +53,8 @@ public class NotificationController {
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
 
-	@Operation(summary = "모든 알림 읽음 처리 API",
-		description = "<p>홈 화면 알림 목록에서 알림 모두 읽기 처리를 할 경우 호출됩니다.")
+	@Operation(summary = "모든 알림 읽음 처리",
+		description = "홈 화면 알림 목록에서 알림 모두 읽기 처리를 할 경우 호출하는 API입니다.")
 	@PatchMapping("/check")
 	public CustomResponse<Void> markAllAsRead(
 		@AuthenticationPrincipal Member member
