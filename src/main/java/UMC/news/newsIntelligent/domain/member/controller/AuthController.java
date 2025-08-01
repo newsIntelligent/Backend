@@ -11,6 +11,7 @@ import UMC.news.newsIntelligent.domain.member.service.AuthService;
 import UMC.news.newsIntelligent.domain.member.service.MemberService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,8 +25,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/members")
+@RequiredArgsConstructor
 @Tag(name="사용자 및 인증 관련 API", description = "사용자 인증 및 가입/로그인/로그아웃/탈퇴")
 public class AuthController {
 
@@ -65,8 +66,7 @@ public class AuthController {
     /* --- 로그아웃 --- */
     @Operation(summary = "로그아웃", description = "액세스 토큰을 무효화하는 API입니다.")
     @PostMapping("/logout")
-    public CustomResponse<?> logout(HttpServletRequest request,
-                                       @AuthenticationPrincipal UserDetails userDetails) {
+    public CustomResponse<?> logout(HttpServletRequest request) {
         String token = JwtTokenProvider.resolveToken(request);
         memberService.logout(token);
         return CustomResponse.onSuccess(GeneralSuccessCode.LOGOUT_SUCCESS);
@@ -76,9 +76,9 @@ public class AuthController {
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 후 액세스 토큰을 무효화하는 API입니다.")
     @DeleteMapping("/withdraw")
     public CustomResponse<?> withdraw(HttpServletRequest request,
-                                      @AuthenticationPrincipal UserDetails userDetails) {
+                                      @AuthenticationPrincipal PrincipalUserDetails principal) {
         String token = JwtTokenProvider.resolveToken(request);
-        Member member = memberRepository.findByEmail(userDetails.getUsername())
+        Member member = memberRepository.findByEmail(principal.getUsername())
                 .orElseThrow();
         memberService.withdraw(member, token);
         return CustomResponse.onSuccess(GeneralSuccessCode.WITHDRAW_SUCCESS);

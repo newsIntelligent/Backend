@@ -4,6 +4,7 @@ import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.service.MemberTopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,12 +23,13 @@ import java.security.Principal;
 @RestController
 @RequestMapping("/api/mypage")
 @RequiredArgsConstructor
-@Tag(name = "마이페이지 내에서의 토픽 목록 조회 컨트롤러", description = "마이페이지 내에서의 조회와 관련된 API들을 관리하는 컨트롤러")
+@Tag(name = "마이페이지 내 조회 관련 API", description = "마이페이지 내에서 읽은 토픽 및 구독 토픽 조회")
 public class MemberTopicController {
 
     private final MemberTopicQueryService memberTopicQueryService;
 
-    @Operation(summary = "읽은 토픽 목록 내 조회 API by 서동혁", description = "읽은 토픽 목록 내 조회")
+    /* --- 읽은 토픽 조회 --- */
+    @Operation(summary = "읽은 토픽 목록 내 조회", description = "읽은 토픽 목록을 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 조회 성공")
     })
@@ -36,16 +38,17 @@ public class MemberTopicController {
             @RequestParam String keyword,
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.searchReadTopics(keyword, cursor, size, member.getId());
+                memberTopicQueryService.searchReadTopics(keyword, cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
 
-    @Operation(summary = "읽은 토픽 목록 리스트 조회 API by 서동혁", description = "읽은 토픽 목록 리스트 조회")
+    /* --- 읽은 토픽 리스트 조회 --- */
+    @Operation(summary = "읽은 토픽 목록 리스트 조회", description = "읽은 토픽 목록 리스트를 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 리스트 조회 성공")
     })
@@ -53,16 +56,17 @@ public class MemberTopicController {
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getReadTopics(
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getReadTopics(cursor, size, member.getId());
+                memberTopicQueryService.getReadTopics(cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
 
-    @Operation(summary = "구독 토픽 리스트 조회 API by 서동혁", description = "구독 토픽 리스트 조회")
+    /* --- 구독 토픽 리스트 조회 --- */
+    @Operation(summary = "구독 토픽 리스트 조회", description = "구독 토픽 리스트를 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "구독 토픽 리스트 조회 성공")
     })
@@ -70,11 +74,11 @@ public class MemberTopicController {
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getSubscriptionTopics(
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getSubscriptionTopics(cursor, size, member.getId());
+                memberTopicQueryService.getSubscriptionTopics(cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
