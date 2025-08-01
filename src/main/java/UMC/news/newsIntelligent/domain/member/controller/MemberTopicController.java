@@ -4,6 +4,7 @@ import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.service.MemberTopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -37,11 +38,11 @@ public class MemberTopicController {
             @RequestParam String keyword,
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.searchReadTopics(keyword, cursor, size, member.getId());
+                memberTopicQueryService.searchReadTopics(keyword, cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
@@ -55,11 +56,11 @@ public class MemberTopicController {
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getReadTopics(
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getReadTopics(cursor, size, member.getId());
+                memberTopicQueryService.getReadTopics(cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
@@ -73,11 +74,11 @@ public class MemberTopicController {
     public CustomResponse<MemberTopicResponseDTO.MemberTopicPreviewListResDTO> getSubscriptionTopics(
             @RequestParam(required = false) Long cursor,
             @RequestParam(defaultValue = "10") @Max(10) int size,
-            @AuthenticationPrincipal Member member
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
 
         MemberTopicResponseDTO.MemberTopicPreviewListResDTO topicResDTO =
-                memberTopicQueryService.getSubscriptionTopics(cursor, size, member.getId());
+                memberTopicQueryService.getSubscriptionTopics(cursor, size, principal.getMemberId());
 
         return CustomResponse.onSuccess(topicResDTO);
     }
