@@ -1,22 +1,19 @@
-package UMC.news.newsIntelligent.domain.news;
-
 package UMC.news.newsIntelligent.domain.news.controller;
 
-import UMC.news.newsIntelligent.domain.news.NewsResponseDTO;
+import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
 import UMC.news.newsIntelligent.domain.news.service.NewsService;
-import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
-import UMC.news.newsIntelligent.global.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/topic")
+@Tag(name = "토픽 뉴스 컨트롤러", description = "토픽 - 출처 기사를 관리하는 컨트롤러")
 public class NewsController {
 
     private final NewsService newsService;
@@ -34,13 +31,6 @@ public class NewsController {
             @RequestParam(defaultValue = "3") int size
     ) {
         NewsResponseDTO.NewsResDTO response = newsService.getRelatedNews(topicId, lastId, size);
-        return CustomResponse.onSuccess(GeneralSuccessCode.GET_TOPIC, topicDetailsDTO);
-    }
-
-
-    @GetMapping("/{topicId}")
-    public CustomResponse<TopicResponseDTO.TopicDetailsResDTO> getTopicArticles(@PathVariable Long topicId){
-        TopicResponseDTO.TopicDetailsResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId);
-        return CustomResponse.onSuccess(GeneralSuccessCode.GET_TOPIC, topicDetailsDTO);
+        return CustomResponse.onSuccess(GeneralSuccessCode.GET_TOPIC, response);
     }
 }

@@ -31,9 +31,6 @@ public class TopicResponseDTO {
             String topicName,
             String aiSummary,
             String imageUrl,
-//            boolean idSub,
             LocalDateTime summaryTime
-//            LocalDateTime createdAt,
-//            LocalDateTime updatedAt
     ) {}
 }

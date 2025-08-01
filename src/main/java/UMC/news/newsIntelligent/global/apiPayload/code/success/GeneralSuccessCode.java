@@ -19,7 +19,8 @@ public enum GeneralSuccessCode implements BaseSuccessCode{
     WITHDRAW_SUCCESS (HttpStatus.OK, "MEMBER204", "회원 탈퇴가 완료되었습니다."),
 
     // 토픽
-    GET_TOPIC(HttpStatus.OK, "TOPIC200", "토픽 상세 페이지 조회가 완료되었습니다.")
+    GET_TOPIC(HttpStatus.OK, "TOPIC200", "토픽 상세 페이지 조회가 완료되었습니다."),
+    GET_NEWS(HttpStatus.OK, "NEWS200", "토픽 출처 기사 목록 조회가 완료되었습니다.")
     ;
 
     private final HttpStatus status;

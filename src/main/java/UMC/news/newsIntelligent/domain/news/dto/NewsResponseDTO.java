@@ -1,8 +1,6 @@
-package UMC.news.newsIntelligent.domain.news;
+package UMC.news.newsIntelligent.domain.news.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
