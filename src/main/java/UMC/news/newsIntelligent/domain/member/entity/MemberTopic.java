@@ -36,4 +36,19 @@ public class MemberTopic extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean isSubscribe;
+
+	/**
+	 *  상태 변경 메서드
+	 */
+	public void markRead() {
+		this.isRead = true;
+	}
+
+	public void subscribe() {
+		this.isSubscribe = true;
+	}
+
+	public void unsubscribe() {
+		this.isSubscribe = false;
+	}
 }

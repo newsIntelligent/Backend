@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.domain.member.repository;
 
+import java.util.Optional;
+
 import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import org.springframework.data.domain.Pageable;
@@ -44,4 +46,5 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
 """)
     Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
+    Optional<MemberTopic> findByMemberIdAndTopicId(Long memberId, Long topicId);
 }

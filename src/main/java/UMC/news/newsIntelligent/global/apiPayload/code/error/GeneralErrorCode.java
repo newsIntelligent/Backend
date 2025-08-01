@@ -24,6 +24,8 @@ public enum GeneralErrorCode implements BaseErrorCode{
     CURSOR_INVALID(HttpStatus.BAD_REQUEST, "CURSOR400", "커서가 유효하지 않습니다."),
     // 알림 에러
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION400", "해당 알림을 찾을 수 없습니다."),
+    // 토픽 관련 에러
+    TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC400", "해당 토픽을 찾을 수 없습니다."),
 
     /* --- 회원/인증 관련 에러 ---*/
     OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
