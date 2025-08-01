@@ -6,6 +6,7 @@ import UMC.news.newsIntelligent.domain.feedback.service.command.FeedbackCommandS
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +30,10 @@ public class FeedbackController {
     @PostMapping("/feedbacks")
     public CustomResponse<?> submitFeedback(
             @RequestBody FeedbackRequestDTO.FeedbackRequest request,
-            @AuthenticationPrincipal Member member
-    ) {
+            @AuthenticationPrincipal PrincipalUserDetails principal
+            ) {
         try {
-            feedbackCommandService.submitFeedback(request, member.getId());
+            feedbackCommandService.submitFeedback(request, principal.getMemberId());
             return CustomResponse.onSuccess(FeedbackSuccessCode.FEEDBACK_CREATED);
 
         } catch (CustomException e) {

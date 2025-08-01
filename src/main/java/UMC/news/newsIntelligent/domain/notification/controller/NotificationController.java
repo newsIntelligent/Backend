@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.notification.controller;
 
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,11 +31,11 @@ public class NotificationController {
 			+ "<p>커서 페이징 처리하였습니다.")
 	@GetMapping
 	public CustomResponse<NotificationResponse.NotificationCursorDto> getNotifications(
-		@AuthenticationPrincipal Member member,
+		@AuthenticationPrincipal PrincipalUserDetails principal,
 		@RequestParam(required = false) String cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		Long memberId = member.getId();
+		Long memberId = principal.getMemberId();
 		NotificationResponse.NotificationCursorDto body =
 			notificationService.getNotifications(memberId, cursor, size);
 
@@ -45,10 +46,10 @@ public class NotificationController {
 		description = "홈 화면 알림 목록에서 하나의 알림에 대한 읽음 처리를 하는 API입니다.")
 	@PatchMapping("/{notificationId}/check")
 	public CustomResponse<Void> markAsRead(
-		@AuthenticationPrincipal Member member,
+		@AuthenticationPrincipal PrincipalUserDetails principal,
 		@PathVariable Long notificationId
 	) {
-		Long memberId = member.getId();
+		Long memberId = principal.getMemberId();
 		notificationService.markAsRead(memberId, notificationId);
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
@@ -57,9 +58,9 @@ public class NotificationController {
 		description = "홈 화면 알림 목록에서 알림 모두 읽기 처리를 할 경우 호출하는 API입니다.")
 	@PatchMapping("/check")
 	public CustomResponse<Void> markAllAsRead(
-		@AuthenticationPrincipal Member member
+		@AuthenticationPrincipal PrincipalUserDetails principal
 	) {
-		Long memberId = member.getId();
+		Long memberId = principal.getMemberId();
 		notificationService.markAllAsRead(memberId);
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
