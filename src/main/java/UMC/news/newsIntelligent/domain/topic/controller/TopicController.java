@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/topics")
 @RequiredArgsConstructor
-@Tag(name = "토픽 컨트롤러", description = "토픽과 관련된 API들을 관리하는 컨트롤러")
+@Tag(name = "토픽 관련 API", description = "토픽 조회/상세 조회")
 public class TopicController {
 
     private final TopicQueryService topicQueryService;
 
-    @Operation(summary = "토픽 조회 API by 서동혁", description = "토픽 조회")
+    @Operation(summary = "토픽 조회", description = "토픽을 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 조회 성공")
     })
@@ -36,7 +36,7 @@ public class TopicController {
         return CustomResponse.onSuccess(topicResDTO);
     }
 
-    @Operation(summary = "토픽 상세 페이지 조회 API by 신윤진", description = "")
+    @Operation(summary = "토픽 상세 페이지 조회", description = "토픽 상세 페이지를 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 상세 페이지 조회 성공")
     })
