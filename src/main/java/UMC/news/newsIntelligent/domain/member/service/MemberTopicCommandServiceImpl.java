@@ -64,7 +64,10 @@ public class MemberTopicCommandServiceImpl implements MemberTopicCommandService 
 
 	@Override
 	public void unsubscribe(Long memberId, Long topicId) {
+		MemberTopic memberTopic = memberTopicRepo.findByMemberIdAndTopicId(memberId, topicId)
+			.orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBERTOPIC_NOT_FOUND));
 
+		memberTopicRepo.delete(memberTopic);
 	}
 
 }
