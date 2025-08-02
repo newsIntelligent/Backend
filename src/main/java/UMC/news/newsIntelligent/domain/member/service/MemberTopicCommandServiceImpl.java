@@ -67,7 +67,12 @@ public class MemberTopicCommandServiceImpl implements MemberTopicCommandService 
 		MemberTopic memberTopic = memberTopicRepo.findByMemberIdAndTopicId(memberId, topicId)
 			.orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBERTOPIC_NOT_FOUND));
 
-		memberTopicRepo.delete(memberTopic);
+		memberTopic.unsubscribe();
+		memberTopicRepo.save(memberTopic);
+
+		if(!memberTopic.getIsRead()) {
+			memberTopicRepo.delete(memberTopic);
+		}
 	}
 
 }
