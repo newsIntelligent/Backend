@@ -32,9 +32,6 @@ public enum GeneralErrorCode implements BaseErrorCode{
     OTP_EXPIRED    ( HttpStatus.BAD_REQUEST, "AUTH402",  "인증번호가 만료되었습니다."),
     ALREADY_DEACTIVATED ( HttpStatus.BAD_REQUEST, "MEMBER403", "이미 탈퇴한 계정입니다."),
     MEMBER_NOT_FOUND (HttpStatus.BAD_REQUEST, "MEMBER404", "존재하지 않는 회원입니다."),
-
-    // 토픽 에러
-    TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC404_1", "존재하지 않는 토픽입니다.")
     ;
 
     // 필요한 필드값 선언
