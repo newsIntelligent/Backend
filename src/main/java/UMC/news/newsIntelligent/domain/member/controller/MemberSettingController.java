@@ -1,12 +1,14 @@
 package UMC.news.newsIntelligent.domain.member.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingRequest;
+import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.service.MemberSettingServiceImpl;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
@@ -54,5 +56,14 @@ public class MemberSettingController {
 	) {
 		settingService.setDailyReportSend(principal.getMemberId(), request.getEnabled());
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+	}
+
+	@Operation(summary = "전체 알림 설정 상태 조회 api", description = "마이페이지 내의 전체 알림 설정 상태를 조회합니다.")
+	@GetMapping
+	public CustomResponse<MemberSettingResponse> getMemberSetting(
+		@AuthenticationPrincipal PrincipalUserDetails principal
+	) {
+		MemberSettingResponse response = settingService.getAllSettings(principal.getMemberId());
+		return CustomResponse.onSuccess(GeneralSuccessCode.OK, response);
 	}
 }
