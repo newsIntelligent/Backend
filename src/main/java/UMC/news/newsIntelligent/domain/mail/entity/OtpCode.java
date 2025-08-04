@@ -19,9 +19,17 @@ public class OtpCode {
     @Id
     private String email;
     @Id @Enumerated(EnumType.STRING)
+
+    @Column(nullable = false)
     private Type type;      // SIGNUP, LOGIN
+
+    @Column(nullable = false)
     private String code;    // 6자리 인증 코드
+
+    @Column(nullable = false)
     private String token;    // 매직링크용 토큰
+
+    @Column(nullable = false)
     private LocalDateTime expiresAt;
 
     /** 완료 플래그:
