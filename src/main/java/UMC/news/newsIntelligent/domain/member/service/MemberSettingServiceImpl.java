@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.member.service;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 	public MemberSettingResponse getAllSettings(Long memberId) {
 		Member m = findMember(memberId);
 
-		List<String> reportTimes = dailyReportRepository.findAllByMemberId(memberId).stream()
+		List<LocalTime> reportTimes = dailyReportRepository.findAllByMemberId(memberId).stream()
 			.map(DailyReport::getReportTime)
 			.toList();
 
