@@ -83,4 +83,13 @@ public class Member extends BaseEntity {
 	public boolean isDeactivated() {
 		return Boolean.TRUE.equals(isDeactivated);
 	}
+	public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
+		this.subscribeTopicAlert = subscribeTopicAlert;
+	}
+	public void setReadTopicAlert(Boolean readTopicAlert) {
+		this.readTopicAlert = readTopicAlert;
+	}
+	public void setDailyReportAlert(Boolean dailyReportAlert) {
+		this.dailyReportAlert = dailyReportAlert;
+	}
 }
