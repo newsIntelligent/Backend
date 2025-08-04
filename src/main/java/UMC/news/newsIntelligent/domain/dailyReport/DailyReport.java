@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.domain.dailyReport;
 
+import java.time.LocalTime;
+
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -32,5 +34,5 @@ public class DailyReport extends BaseEntity {
 	private Member member;
 
 	@Column(nullable = false)
-	private String reportTime;
+	private LocalTime reportTime;
 }
