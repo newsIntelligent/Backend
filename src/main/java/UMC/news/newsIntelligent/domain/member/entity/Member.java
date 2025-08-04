@@ -55,12 +55,14 @@ public class Member extends BaseEntity {
 		cascade = CascadeType.ALL,
 		orphanRemoval = true,
 		fetch = FetchType.LAZY)
+	@Builder.Default
 	private List<DailyReport> dailyReports = new ArrayList<>();
 
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
 		orphanRemoval = true)
+	@Builder.Default
 	private List<MemberTopic> memberTopics = new ArrayList<>();
 
 	public static Member newMember(String email) {
