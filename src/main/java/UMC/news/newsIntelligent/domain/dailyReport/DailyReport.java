@@ -35,4 +35,11 @@ public class DailyReport extends BaseEntity {
 
 	@Column(nullable = false)
 	private LocalTime reportTime;
+
+	public static DailyReport of(Member member, LocalTime reportTime) {
+		return DailyReport.builder()
+			.member(member)
+			.reportTime(reportTime)
+			.build();
+	}
 }

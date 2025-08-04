@@ -13,5 +13,5 @@ public class MemberSettingResponse {
 	private Boolean subscribeNotification;
 	private Boolean readTopicNotification;
 	private Boolean dailyReportSend;
-	private List<LocalTime> dailyReportTimes;  // "HH:mm" 문자열 목록
+	private List<LocalTime> dailyReportTimes;
 }

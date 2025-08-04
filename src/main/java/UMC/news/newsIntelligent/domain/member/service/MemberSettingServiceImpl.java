@@ -62,4 +62,33 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 			reportTimes
 		);
 	}
+
+	@Override
+	public void addReportTime(Long memberId, LocalTime reportTime) {
+		Member m = findMember(memberId);
+
+		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
+		// 시간 추가 최대 3개
+		if(existing.size() >= 3) {
+			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+		}
+		// 시간 중복 추가 방지 검증
+		boolean dup = existing.stream()
+			.anyMatch(dr -> dr.getReportTime().equals(reportTime));
+		if (dup) {
+			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+		}
+		DailyReport report = DailyReport.of(m, reportTime);
+		dailyReportRepository.save(report);
+	}
+
+	@Override
+	public void removeReportTime(Long memberId, Long timeId) {
+		DailyReport report = dailyReportRepository.findById(timeId)
+			.orElseThrow(() -> new CustomException(GeneralErrorCode.DAILY_REPORT_NOT_FOUND));
+		if (!report.getMember().getId().equals(memberId)) {
+			throw new CustomException(GeneralErrorCode.FORBIDDEN_403);
+		}
+		dailyReportRepository.delete(report);
+	}
 }
