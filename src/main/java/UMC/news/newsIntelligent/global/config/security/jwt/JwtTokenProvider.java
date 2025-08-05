@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -19,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.security.Key;
 import java.util.Date;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -35,12 +37,13 @@ public class JwtTokenProvider {
     public String generateAccessToken(Long id, String email, String role) {
         long expMs = jwtProperties.getExpiration().getAccess();
         Date now = new Date();
+        String jwtId = UUID.randomUUID().toString();
 
         return Jwts.builder()
-                .setId(UUID.randomUUID().toString())
+                .setId(jwtId)
                 .setSubject(email)
                 .claim("id", id)
-                .claim("role", role)
+                .claim("role", role == null ? "ROLE_USER" : role)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expMs))
                 .signWith(signingKey(), SignatureAlgorithm.HS256)
@@ -65,39 +68,31 @@ public class JwtTokenProvider {
 
         Long id = ((Number) claims.get("id")).longValue();
         String email = claims.getSubject();
-        String role  = claims.getOrDefault("role", "ROLE_USER").toString();
+        String role  = claims.get("role", String.class);
+        if (role == null) role = "ROLE_USER";
 
-        PrincipalUserDetails principal = new PrincipalUserDetails(
-                id,
-                email,
-                Collections.singleton(() -> role)
-        );
+        // 권한은 SimpleGrantedAuthority로 명시
+        var authorities = List.of(new SimpleGrantedAuthority(role));
+        var principal = new User(email, "", authorities);
 
-        return new UsernamePasswordAuthenticationToken(
-                principal, token, principal.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     public static String resolveToken(HttpServletRequest request) {
-        String bearer = request.getHeader(Constants.AUTH_HEADER);      // e.g. "Authorization"
+        String bearer = request.getHeader(Constants.AUTH_HEADER);
         if (StringUtils.hasText(bearer) && bearer.startsWith(Constants.TOKEN_PREFIX)) {
-            return bearer.substring(Constants.TOKEN_PREFIX.length()); // "Bearer "
+            return bearer.substring(Constants.TOKEN_PREFIX.length());
         }
         return null;
     }
 
     public String getJwtId(String token) {
-        return getClaims(token).getId();                    // jwtId
+        return Jwts.parserBuilder().setSigningKey(signingKey()).build()
+                .parseClaimsJws(token).getBody().getId();
     }
 
     public Date getExpiration(String token) {
-        return getClaims(token).getExpiration();
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(signingKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(signingKey()).build()
+                .parseClaimsJws(token).getBody().getExpiration();
     }
 }
