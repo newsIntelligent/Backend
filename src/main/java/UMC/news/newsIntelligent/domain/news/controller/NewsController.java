@@ -22,7 +22,7 @@ public class NewsController {
     private final NewsService newsService;
     private final TopicQueryService topicQueryService;
 
-    @Operation(summary = "토픽 상세 페이지 조회", description = "토픽 상세 페이지를 조회하는 API입니다")
+    @Operation(summary = "토픽 상세 페이지 조회 API", description = "토픽 상세 페이지를 조회하는 API입니다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 상세 페이지 조회 성공")
     })
