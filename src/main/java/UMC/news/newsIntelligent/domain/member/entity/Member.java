@@ -94,7 +94,8 @@ public class Member extends BaseEntity {
 	}
 	public void changeNotificationEmail(String email) { this.notificationEmail = email; }
 	public void changeNickname(String nickname) { this.nickname = nickname; }
-	public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
+
+    public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
 		this.subscribeTopicAlert = subscribeTopicAlert;
 	}
 	public void setReadTopicAlert(Boolean readTopicAlert) {
