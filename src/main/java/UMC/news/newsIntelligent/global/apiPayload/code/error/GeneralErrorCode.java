@@ -30,11 +30,17 @@ public enum GeneralErrorCode implements BaseErrorCode{
     // 데일리 리포트 관련 에러
     DAILY_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "데일리 리포트를 찾을 수 없습니다."),
 
-    /* --- 회원/인증 관련 에러 ---*/
+    // 인증 에러
     OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
     OTP_EXPIRED    ( HttpStatus.BAD_REQUEST, "AUTH402",  "인증번호가 만료되었습니다."),
-    ALREADY_DEACTIVATED ( HttpStatus.BAD_REQUEST, "MEMBER403", "이미 탈퇴한 계정입니다."),
+    INVALID_TOKEN (HttpStatus.BAD_REQUEST, "AUTH403", "토큰이 유효하지 않습니다."),
+
+    // 회원 관련 에러
+    MEMBER_ALREADY_EXIST (HttpStatus.BAD_REQUEST, "MEMBER401", "이미 가입된 계정입니다"),
+    MEMBER_ALREADY_DEACTIVATED ( HttpStatus.BAD_REQUEST, "MEMBER403", "이미 탈퇴한 계정입니다."),
     MEMBER_NOT_FOUND (HttpStatus.BAD_REQUEST, "MEMBER404", "존재하지 않는 회원입니다."),
+    NICKNAME_DUPLICATED (HttpStatus.CONFLICT, "MEMBER409", "이미 사용 중인 닉네임입니다.")
+
     ;
 
     // 필요한 필드값 선언
