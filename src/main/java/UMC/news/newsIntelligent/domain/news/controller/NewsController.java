@@ -29,7 +29,7 @@ public class NewsController {
     @GetMapping("/{topicId}")
     public CustomResponse<TopicResponseDTO.TopicDetailsResDTO> getTopicDetails(@PathVariable Long topicId){
         TopicResponseDTO.TopicDetailsResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId);
-        return CustomResponse.onSuccess(GeneralSuccessCode.GET_TOPIC, topicDetailsDTO);
+        return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, topicDetailsDTO);
     }
 
     @Operation(summary = "토픽 상세 페이지 - 출처 기사 목록 조회", description = "주제 생성에 사용된 출처 기사 목록을 반환하는 API입니다")
