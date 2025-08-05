@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.domain.dailyReport;
 
+import java.time.LocalTime;
+
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -12,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class DailyReport extends BaseEntity {
 
 	@Id
@@ -30,5 +34,12 @@ public class DailyReport extends BaseEntity {
 	private Member member;
 
 	@Column(nullable = false)
-	private String reportTime;
+	private LocalTime reportTime;
+
+	public static DailyReport of(Member member, LocalTime reportTime) {
+		return DailyReport.builder()
+			.member(member)
+			.reportTime(reportTime)
+			.build();
+	}
 }

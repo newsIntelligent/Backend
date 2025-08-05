@@ -55,12 +55,14 @@ public class Member extends BaseEntity {
 		cascade = CascadeType.ALL,
 		orphanRemoval = true,
 		fetch = FetchType.LAZY)
+	@Builder.Default
 	private List<DailyReport> dailyReports = new ArrayList<>();
 
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
 		orphanRemoval = true)
+	@Builder.Default
 	private List<MemberTopic> memberTopics = new ArrayList<>();
 
 	public static Member newMember(String email) {
@@ -82,5 +84,14 @@ public class Member extends BaseEntity {
 	}
 	public boolean isDeactivated() {
 		return Boolean.TRUE.equals(isDeactivated);
+	}
+	public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
+		this.subscribeTopicAlert = subscribeTopicAlert;
+	}
+	public void setReadTopicAlert(Boolean readTopicAlert) {
+		this.readTopicAlert = readTopicAlert;
+	}
+	public void setDailyReportAlert(Boolean dailyReportAlert) {
+		this.dailyReportAlert = dailyReportAlert;
 	}
 }

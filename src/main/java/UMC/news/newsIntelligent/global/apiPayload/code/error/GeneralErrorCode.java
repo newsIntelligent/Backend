@@ -27,6 +27,8 @@ public enum GeneralErrorCode implements BaseErrorCode{
     // 토픽 관련 에러
     TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC400", "해당 토픽을 찾을 수 없습니다."),
     MEMBERTOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC401", "해당 멤버와 관계를 가진 토픽을 찾을 수 없습니다."),
+    // 데일리 리포트 관련 에러
+    DAILY_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "데일리 리포트를 찾을 수 없습니다."),
 
     /* --- 회원/인증 관련 에러 ---*/
     OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
