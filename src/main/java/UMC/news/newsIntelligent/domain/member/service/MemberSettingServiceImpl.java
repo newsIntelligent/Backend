@@ -12,6 +12,7 @@ import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +26,7 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 
 	private Member findMember(Long memberId) {
 		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override
