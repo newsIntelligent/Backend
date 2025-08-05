@@ -92,11 +92,10 @@ public class MemberSettingController {
 	@Operation(summary = "데일리리포트 수신 시간 삭제", description = "timeId는 데일리리포트의 PK id를 의미합니다.")
 	@DeleteMapping("/time/{timeId}")
 	public CustomResponse<Void> removeReportTime(
-		@AuthenticationPrincipal UserDetails user,
+		@AuthenticationPrincipal PrincipalUserDetails principal,
 		@PathVariable Long timeId
 	) {
-		Long memberId = Long.parseLong(user.getUsername());
-		settingService.removeReportTime(memberId, timeId);
+		settingService.removeReportTime(principal.getMemberId(), timeId);
 		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
 }

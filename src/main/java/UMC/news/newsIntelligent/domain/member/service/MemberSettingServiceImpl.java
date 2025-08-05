@@ -70,13 +70,13 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
 		// 시간 추가 최대 3개
 		if(existing.size() >= 3) {
-			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+			throw new CustomException(GeneralErrorCode.NUMBER_OF_TIME_EXCEEDED);
 		}
 		// 시간 중복 추가 방지 검증
 		boolean dup = existing.stream()
 			.anyMatch(dr -> dr.getReportTime().equals(reportTime));
 		if (dup) {
-			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+			throw new CustomException(GeneralErrorCode.TIME_ALREADY_HAVE);
 		}
 		DailyReport report = DailyReport.of(m, reportTime);
 		dailyReportRepository.save(report);

@@ -2,6 +2,8 @@ package UMC.news.newsIntelligent.global.apiPayload.code.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 
 @AllArgsConstructor
@@ -29,6 +31,9 @@ public enum GeneralErrorCode implements BaseErrorCode{
     MEMBERTOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC401", "해당 멤버와 관계를 가진 토픽을 찾을 수 없습니다."),
     // 데일리 리포트 관련 에러
     DAILY_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "데일리 리포트를 찾을 수 없습니다."),
+    // 마이페이지 세팅 에러
+    NUMBER_OF_TIME_EXCEEDED(HttpStatus.BAD_REQUEST, "SETTING400", "데일리 리포트 발신 시간은 최대 3개를 초과할 수 없습니다."),
+    TIME_ALREADY_HAVE(HttpStatus.BAD_REQUEST, "SETTING401", "이미 있는 시간은 추가할 수 없습니다."),
 
     /* --- 회원/인증 관련 에러 ---*/
     OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
