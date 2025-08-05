@@ -1,6 +1,8 @@
 package UMC.news.newsIntelligent.domain.mail.entity;
 
 import UMC.news.newsIntelligent.domain.member.entity.Member;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
                 columnNames = "member_id"
         )
 )
-public class NotificationEmailChange extends BaseEntity {
+public class NotificationEmail extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +48,22 @@ public class NotificationEmailChange extends BaseEntity {
     @Column(nullable = false) @Builder.Default
     private Boolean verified = false;
 
-    public boolean isExpired() { return expiresAt.isBefore(LocalDateTime.now()); }
+
+    public void validateUsable() {
+        if (Boolean.TRUE.equals(verified))
+            throw new CustomException(GeneralErrorCode.OTP_WRONG);   // 불일치
+        if (expiresAt.isBefore(LocalDateTime.now()))
+            throw new CustomException(GeneralErrorCode.OTP_EXPIRED);   // 만료
+    }
+
     public void markVerified() { this.verified = true; }
+
+    // 갱신 메서드
+    public void refresh(String newEmail, String code, String token, LocalDateTime expiresAt) {
+        this.newEmail  = newEmail;
+        this.code      = code;
+        this.token     = token;
+        this.expiresAt = expiresAt;
+        this.verified  = false;
+    }
 }
