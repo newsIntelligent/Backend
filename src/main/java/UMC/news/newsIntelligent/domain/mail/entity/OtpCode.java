@@ -18,8 +18,8 @@ public class OtpCode {
 
     @Id
     private String email;
-    @Id @Enumerated(EnumType.STRING)
 
+    @Id @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;      // SIGNUP, LOGIN
 
