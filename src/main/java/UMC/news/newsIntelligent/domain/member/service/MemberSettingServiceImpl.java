@@ -43,7 +43,13 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 	@Override
 	public void setDailyReportSend(Long memberId, Boolean enabled) {
 		Member m = findMember(memberId);
+
+		if (enabled && m.getDailyReports().isEmpty()) {
+			addReportTime(memberId, LocalTime.of(11, 0));
+		}
+
 		m.setDailyReportAlert(enabled);
+		memberRepository.save(m);
 	}
 
 	@Override
