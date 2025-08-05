@@ -1,4 +1,11 @@
 package UMC.news.newsIntelligent.domain.member.dto;
 
-public record TokenResponseDto(String accessToken) {
-}
+import lombok.Builder;
+
+import java.time.Instant;
+
+@Builder
+public record TokenResponseDto(
+        String accessToken,
+        Instant expiresAt
+) {}
