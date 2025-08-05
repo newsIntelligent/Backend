@@ -4,7 +4,7 @@ import UMC.news.newsIntelligent.domain.member.converter.MemberInfoConverter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberInfoDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -38,20 +38,20 @@ public class MemberInfoService {
         Member member = findActive(memberId);
 
         if (memberRepository.existsByNickname(nick))
-            throw new CustomException(GeneralErrorCode.NICKNAME_DUPLICATED);
+            throw new CustomException(ErrorCode.NICKNAME_DUPLICATED);
 
         try {
             member.changeNickname(nick);
             return MemberInfoConverter.toDto(member);
         } catch (DataIntegrityViolationException e) {
-            throw new CustomException(GeneralErrorCode.BAD_REQUEST_400);
+            throw new CustomException(ErrorCode.BAD_REQUEST_400);
         }
     }
 
     private Member findActive(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
-        if (member.isDeactivated()) throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        if (member.isDeactivated()) throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
         return member;
     }
 }

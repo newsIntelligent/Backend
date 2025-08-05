@@ -9,8 +9,8 @@ import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.service.AuthService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
@@ -37,14 +37,14 @@ public class AuthController {
     @PostMapping("/signup/email")
     public CustomResponse<?> signupEmail(@RequestBody EmailRequestDto request) {
         authService.sendCode(request.email(), OtpCode.Type.SIGNUP);
-        return CustomResponse.onSuccess(GeneralSuccessCode.EMAIL_SENT);
+        return CustomResponse.onSuccess(SuccessCode.EMAIL_SENT);
     }
 
     @Operation(summary = "로그인 인증번호 전송", description = "로그인 시 사용자에게 이메일로 인증번호를 전송하는 API입니다.")
     @PostMapping("/login/email")
     public CustomResponse<?> loginEmail(@RequestBody EmailRequestDto request) {
         authService.sendCode(request.email(), OtpCode.Type.LOGIN);
-        return CustomResponse.onSuccess(GeneralSuccessCode.EMAIL_SENT);
+        return CustomResponse.onSuccess(SuccessCode.EMAIL_SENT);
     }
 
     /* 인증 코드 검증 */
@@ -52,13 +52,13 @@ public class AuthController {
     @PostMapping("/signup/verify")
     public CustomResponse<MemberResponseDto>  signupVerify(@RequestBody VerifyRequestDto request) {
         MemberResponseDto responseDto = authService.signupByCode(request.email(), request.code());
-        return CustomResponse.onSuccess(GeneralSuccessCode.SIGNUP_SUCCESS, responseDto);
+        return CustomResponse.onSuccess(SuccessCode.SIGNUP_SUCCESS, responseDto);
     }
     @Operation(summary = "로그인 인증코드 검증", description = "로그인 시 전송된 6자리 코드를 검증하는  API입니다.")
     @PostMapping("/login/verify")
     public CustomResponse<TokenResponseDto> loginVerify(@RequestBody VerifyRequestDto request) {
         TokenResponseDto responseDto =  authService.loginByCode(request.email(), request.code());
-        return CustomResponse.onSuccess(GeneralSuccessCode.LOGIN_SUCCESS, responseDto);
+        return CustomResponse.onSuccess(SuccessCode.LOGIN_SUCCESS, responseDto);
     }
 
     /* 로그아웃 */
@@ -67,7 +67,7 @@ public class AuthController {
     public CustomResponse<?> logout(HttpServletRequest request) {
         String token = JwtTokenProvider.resolveToken(request);
         authService.logout(token);
-        return CustomResponse.onSuccess(GeneralSuccessCode.LOGOUT_SUCCESS);
+        return CustomResponse.onSuccess(SuccessCode.LOGOUT_SUCCESS);
     }
 
     /* 회원 탈퇴 */
@@ -77,9 +77,9 @@ public class AuthController {
                                       @AuthenticationPrincipal PrincipalUserDetails principal) {
         String token = JwtTokenProvider.resolveToken(request);
         Member member = memberRepository.findByEmail(principal.getUsername())
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         authService.withdraw(member, token);
-        return CustomResponse.onSuccess(GeneralSuccessCode.WITHDRAW_SUCCESS);
+        return CustomResponse.onSuccess(SuccessCode.WITHDRAW_SUCCESS);
     }
 
 

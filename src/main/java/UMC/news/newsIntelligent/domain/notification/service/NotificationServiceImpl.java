@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import UMC.news.newsIntelligent.domain.notification.Notification;
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.repository.NotificationRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +37,7 @@ public class NotificationServiceImpl implements NotificationService {
 				id = Long.parseLong(parts[1]);
 
 			} catch (IllegalArgumentException | DateTimeException e) {
-				throw new CustomException(GeneralErrorCode.CURSOR_INVALID);
+				throw new CustomException(ErrorCode.CURSOR_INVALID);
 			}
 		}
 		// size+1 만큼 조회
@@ -65,7 +65,7 @@ public class NotificationServiceImpl implements NotificationService {
 	public void markAsRead(Long memberId, Long notificationId) {
 		Notification n = notificationRepository
 			.findByIdAndMemberId(notificationId, memberId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.NOTIFICATION_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.NOTIFICATION_NOT_FOUND));
 		n.setChecked(true);
 	}
 

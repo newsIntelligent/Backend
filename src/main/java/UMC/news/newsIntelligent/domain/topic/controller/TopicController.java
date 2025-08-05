@@ -4,7 +4,7 @@ import UMC.news.newsIntelligent.domain.member.service.MemberTopicCommandService;
 import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.domain.topic.service.query.TopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -58,7 +58,7 @@ public class TopicController {
         @PathVariable Long topicId
     ) {
         memberTopicCommandService.markRead(principal.getMemberId(), topicId);
-        return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+        return CustomResponse.onSuccess(SuccessCode.OK, null);
     }
 
     @Operation(summary = "토픽 구독 요청 API", description = "<p>회원이 특정 토픽을 구독합니다.")
@@ -68,7 +68,7 @@ public class TopicController {
         @PathVariable Long topicId
     ) {
         memberTopicCommandService.subscribe(principal.getMemberId(), topicId);
-        return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+        return CustomResponse.onSuccess(SuccessCode.OK, null);
     }
 
     @Operation(summary = "토픽 구독 취소 API", description = "<p>회원이 특정 토픽 구독을 취소합니다.")
@@ -78,7 +78,7 @@ public class TopicController {
         @PathVariable Long topicId
     ) {
         memberTopicCommandService.unsubscribe(principal.getMemberId(), topicId);
-        return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+        return CustomResponse.onSuccess(SuccessCode.OK, null);
     }
 
 }

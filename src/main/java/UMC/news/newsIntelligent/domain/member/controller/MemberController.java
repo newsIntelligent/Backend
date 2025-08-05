@@ -4,8 +4,8 @@ import UMC.news.newsIntelligent.domain.member.dto.MemberInfoDto;
 import UMC.news.newsIntelligent.domain.member.service.MemberInfoService;
 import UMC.news.newsIntelligent.domain.mail.service.NotificationEmailChangeService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +35,7 @@ public class MemberController {
         MemberInfoDto.MemberInfoResponse response = memberInfoService.getInfo(principal.getMemberId());
 
         return CustomResponse.onSuccess(
-                GeneralSuccessCode.GET_MEMBER_INFO,
+                SuccessCode.GET_MEMBER_INFO,
                 List.of(response)
         );
     }
@@ -45,7 +45,7 @@ public class MemberController {
     @GetMapping("/nickname-availability")
     public CustomResponse<MemberInfoDto.NicknameAvailabilityResponse> nicknameAvailability(
             @RequestParam String nickname) {
-        return CustomResponse.onSuccess(GeneralSuccessCode.NICKNAME_VALID,  memberInfoService.checkNicknameAvailability(nickname));
+        return CustomResponse.onSuccess(SuccessCode.NICKNAME_VALID,  memberInfoService.checkNicknameAvailability(nickname));
     }
 
     /* 닉네임 변경 */
@@ -55,9 +55,9 @@ public class MemberController {
             @AuthenticationPrincipal PrincipalUserDetails principal,
             @RequestBody @Valid MemberInfoDto.UpdateNicknameRequest req) {
 
-        if (principal == null) throw new CustomException(GeneralErrorCode.UNAUTHORIZED_401);
+        if (principal == null) throw new CustomException(ErrorCode.UNAUTHORIZED_401);
 
-        return CustomResponse.onSuccess(GeneralSuccessCode.NICKNAME_CHANGED, memberInfoService.updateNickname(principal.getMemberId(), req.nickname()));
+        return CustomResponse.onSuccess(SuccessCode.NICKNAME_CHANGED, memberInfoService.updateNickname(principal.getMemberId(), req.nickname()));
     }
 
     /* 알림 이메일 변경 - 인증 메일 발송 */
@@ -66,9 +66,9 @@ public class MemberController {
     public CustomResponse<?> ChangeNotificationEmail(
             @AuthenticationPrincipal PrincipalUserDetails principal,
             @RequestBody @Valid MemberInfoDto.UpdateEmailRequest req) {
-        if (principal == null) throw new CustomException(GeneralErrorCode.UNAUTHORIZED_401);
+        if (principal == null) throw new CustomException(ErrorCode.UNAUTHORIZED_401);
         notificationEmailChangeService.changeNotificationEmail(principal.getMemberId(), req);
-        return CustomResponse.onSuccess(GeneralSuccessCode.EMAIL_SENT);
+        return CustomResponse.onSuccess(SuccessCode.EMAIL_SENT);
     }
 
     /* 알림 이메일 변경 - 인증 코드 검증 */
@@ -77,9 +77,9 @@ public class MemberController {
     public CustomResponse<?> verifyChangeByCode(
             @AuthenticationPrincipal PrincipalUserDetails principal,
             @RequestBody @Valid MemberInfoDto.VerifyCodeRequest req) {
-        if (principal == null) throw new CustomException(GeneralErrorCode.UNAUTHORIZED_401);
+        if (principal == null) throw new CustomException(ErrorCode.UNAUTHORIZED_401);
         notificationEmailChangeService.verifyByCode(principal.getMemberId(), req);
-        return CustomResponse.onSuccess(GeneralSuccessCode.OTP_RIGHT);
+        return CustomResponse.onSuccess(SuccessCode.OTP_RIGHT);
     }
 
     /* 알림 이메일 변경 - 매직링크 */

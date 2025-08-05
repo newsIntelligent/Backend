@@ -9,7 +9,7 @@ import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import UMC.news.newsIntelligent.domain.topic.repository.TopicRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 
@@ -25,9 +25,9 @@ public class MemberTopicCommandServiceImpl implements MemberTopicCommandService 
 	@Override
 	public void markRead(Long memberId, Long topicId) {
 		Member member = memberRepo.findById(memberId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 		Topic topic = topicRepo.findById(topicId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.TOPIC_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
 		// 관계가 없으면 생성, 있으면 isRead 만 true 로 build
 		MemberTopic memberTopic = memberTopicRepo.findByMemberIdAndTopicId(memberId, topicId)
@@ -45,9 +45,9 @@ public class MemberTopicCommandServiceImpl implements MemberTopicCommandService 
 	@Override
 	public void subscribe(Long memberId, Long topicId) {
 		Member member = memberRepo.findById(memberId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 		Topic topic = topicRepo.findById(topicId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.TOPIC_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
 		// 관계가 없으면 생성, 있으면 isSubscribe 만 true 로 build
 		MemberTopic memberTopic = memberTopicRepo.findByMemberIdAndTopicId(memberId, topicId)
@@ -65,7 +65,7 @@ public class MemberTopicCommandServiceImpl implements MemberTopicCommandService 
 	@Override
 	public void unsubscribe(Long memberId, Long topicId) {
 		MemberTopic memberTopic = memberTopicRepo.findByMemberIdAndTopicId(memberId, topicId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBERTOPIC_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBERTOPIC_NOT_FOUND));
 
 		memberTopic.unsubscribe();
 		memberTopicRepo.save(memberTopic);

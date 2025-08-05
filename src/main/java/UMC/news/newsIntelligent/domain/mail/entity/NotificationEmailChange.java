@@ -1,7 +1,7 @@
 package UMC.news.newsIntelligent.domain.mail.entity;
 
 import UMC.news.newsIntelligent.domain.member.entity.Member;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -51,9 +51,9 @@ public class NotificationEmailChange extends BaseEntity {
 
     public void validateUsable() {
         if (Boolean.TRUE.equals(verified))
-            throw new CustomException(GeneralErrorCode.OTP_WRONG);   // 불일치
+            throw new CustomException(ErrorCode.OTP_WRONG);   // 불일치
         if (expiresAt.isBefore(LocalDateTime.now()))
-            throw new CustomException(GeneralErrorCode.OTP_EXPIRED);   // 만료
+            throw new CustomException(ErrorCode.OTP_EXPIRED);   // 만료
     }
 
     public void markVerified() { this.verified = true; }

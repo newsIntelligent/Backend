@@ -1,16 +1,13 @@
 package UMC.news.newsIntelligent.global.config.security.jwt;
 
-import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.repository.RevokedTokenRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
-import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -36,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 해당 jwtId가 revokedToken에 있으면 무효화 처리
             if (revokedTokenRepository.existsByJwtId(jwtId)) {
-                throw new CustomException(GeneralErrorCode.INVALID_TOKEN);
+                throw new CustomException(ErrorCode.INVALID_TOKEN);
             }
 
             // 정상 토큰이면 Authentication 설정

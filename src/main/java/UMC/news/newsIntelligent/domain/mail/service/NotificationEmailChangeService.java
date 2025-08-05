@@ -5,7 +5,7 @@ import UMC.news.newsIntelligent.domain.mail.repository.NotificationEmailChangeRe
 import UMC.news.newsIntelligent.domain.member.dto.MemberInfoDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class NotificationEmailChangeService {
         String newEmail = request.newEmail().trim();
 
         if (newEmail.equalsIgnoreCase(member.getNotificationEmail()))
-            throw new CustomException(GeneralErrorCode.BAD_REQUEST_400);
+            throw new CustomException(ErrorCode.BAD_REQUEST_400);
 
         int ttlMinutes = 10;
 
@@ -59,11 +59,11 @@ public class NotificationEmailChangeService {
         Member member = findActive(memberId);
 
         NotificationEmailChange change = changeRepository.findByMemberId(memberId)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
         change.validateUsable();
 
         if (!change.getCode().equals(request.code()))
-            throw new CustomException(GeneralErrorCode.OTP_WRONG);
+            throw new CustomException(ErrorCode.OTP_WRONG);
 
         member.changeNotificationEmail(change.getNewEmail());
         change.markVerified();
@@ -74,13 +74,13 @@ public class NotificationEmailChangeService {
     public void verifyByToken(String token) {
 
         NotificationEmailChange change = changeRepository.findByToken(token)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.INVALID_TOKEN));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
 
         change.validateUsable();
 
         Member member = change.getMember();
         if (member.isDeactivated()) {
-            throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
         }
 
         member.changeNotificationEmail(change.getNewEmail());
@@ -91,8 +91,8 @@ public class NotificationEmailChangeService {
 
     private Member findActive(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
-        if (member.isDeactivated()) throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        if (member.isDeactivated()) throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
         return member;
     }
 }

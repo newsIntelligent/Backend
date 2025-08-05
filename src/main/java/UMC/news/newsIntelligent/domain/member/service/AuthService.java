@@ -9,7 +9,7 @@ import UMC.news.newsIntelligent.domain.member.entity.RevokedToken;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
 import UMC.news.newsIntelligent.domain.member.dto.TokenResponseDto;
 import UMC.news.newsIntelligent.domain.member.repository.RevokedTokenRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
 import jakarta.transaction.Transactional;
@@ -40,15 +40,15 @@ public class AuthService {
 
         // 1) 회원가입 메일: 이미 가입된 주소면 차단
         if (type == SIGNUP && memberRepository.existsByEmail(email)) {
-            throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_EXIST);
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_EXIST);
         }
 
         // 2) 로그인 메일: 가입되지 않은 주소(또는 탈퇴 계정)면 차단
         if (type == LOGIN) {
             Member member = memberRepository.findByEmail(email)
-                    .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));;
+                    .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));;
             if (Boolean.TRUE.equals(member.getIsDeactivated())) {
-                throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+                throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
             }
         }
 
@@ -72,11 +72,11 @@ public class AuthService {
     /* 회원가입 코드 검증 */
     public MemberResponseDto signupByCode(String email, String code) {
         OtpCode otp = otpCodeRepository.findByEmailAndType(email, OtpCode.Type.SIGNUP)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.BAD_REQUEST_400));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
 
         if (!otp.getCode().equals(code))
-            throw new CustomException(GeneralErrorCode.OTP_WRONG);
+            throw new CustomException(ErrorCode.OTP_WRONG);
 
         Member member = memberRepository.findByEmail(email).orElse(null);
         if (member == null) {
@@ -103,16 +103,16 @@ public class AuthService {
     /* 로그인 코드 검증 */
     public TokenResponseDto loginByCode(String email, String code) {
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member.isDeactivated())
-            throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
 
         OtpCode otpCode = otpCodeRepository.findByEmailAndType(email, LOGIN)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.BAD_REQUEST_400));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otpCode.validateUsable();
         if (!otpCode.getCode().equals(code))
-            throw new CustomException(GeneralErrorCode.OTP_WRONG);
+            throw new CustomException(ErrorCode.OTP_WRONG);
 
         String token = jwtTokenProvider.generateAccessToken(member.getId(), member.getEmail(), "ROLE_USER");
         Date exp = jwtTokenProvider.getExpiration(token);
@@ -126,7 +126,7 @@ public class AuthService {
     /* 회원가입 매직링크 검증 */
     public MemberResponseDto signupByToken(String token) {
         OtpCode otp = otpCodeRepository.findByTokenAndType(token, SIGNUP)
-                .orElseThrow(() ->  new CustomException(GeneralErrorCode.BAD_REQUEST_400));
+                .orElseThrow(() ->  new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
         return signupByCode(otp.getEmail(), otp.getCode());
     }
@@ -134,7 +134,7 @@ public class AuthService {
     /* 로그인 매직링크 검증 */
     public TokenResponseDto loginByToken(String token) {
         OtpCode otp = otpCodeRepository.findByTokenAndType(token, LOGIN)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.BAD_REQUEST_400));
+                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
         return loginByCode(otp.getEmail(), otp.getCode());
     }
@@ -154,7 +154,7 @@ public class AuthService {
     public void withdraw(Member member, String accessToken) {
         // 탈퇴 여부 확인
         if (member.isDeactivated()) {
-            throw new CustomException(GeneralErrorCode.MEMBER_ALREADY_DEACTIVATED);
+            throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
         }
 
         member.deactivate();    // isDeactivated = true로 설정

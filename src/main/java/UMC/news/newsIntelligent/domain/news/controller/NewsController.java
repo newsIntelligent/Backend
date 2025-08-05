@@ -5,7 +5,7 @@ import UMC.news.newsIntelligent.domain.news.service.NewsService;
 import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.domain.topic.service.query.TopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -43,6 +43,6 @@ public class NewsController {
             @RequestParam(defaultValue = "3") int size
     ) {
         NewsResponseDTO.NewsResDTO response = newsService.getRelatedNews(topicId, lastId, size);
-        return CustomResponse.onSuccess(GeneralSuccessCode.GET_TOPIC, response);
+        return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, response);
     }
 }
