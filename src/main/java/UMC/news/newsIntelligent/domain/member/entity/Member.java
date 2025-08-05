@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false)
 	private String notificationEmail;
 
-	// 닉네임: 가입 시 이메일 @앞부분에서 자동 설정(중복 불가)
+	// 닉네임: 가입 시 이메일 @앞부분으로 자동 설정
 	@Column(nullable = false, unique = true)
 	private String nickname;
 
@@ -58,6 +58,7 @@ public class Member extends BaseEntity {
 	private Boolean isDeactivated;
 
 	// 데일리 리포트
+	@Builder.Default
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
@@ -66,6 +67,7 @@ public class Member extends BaseEntity {
 	@Builder.Default
 	private List<DailyReport> dailyReports = new ArrayList<>();
 
+	@Builder.Default
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
