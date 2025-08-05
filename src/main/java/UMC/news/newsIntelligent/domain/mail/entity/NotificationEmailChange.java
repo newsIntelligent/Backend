@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
                 columnNames = "member_id"
         )
 )
-public class NotificationEmail extends BaseEntity {
+public class NotificationEmailChange extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
