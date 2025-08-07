@@ -62,10 +62,16 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:5173"     // 로컬 개발 환경
+                "http://localhost:5173",    // 로컬 개발 환경
+                "https://newsintelligent.site",
+                "https://www.newsintelligent.site",
+                "https://api.newsintelligent.site",
+                "https://api.newsintelligent.site"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
