@@ -97,30 +97,6 @@ public class MemberSettingController {
 	) {
 		Long memberId = Long.parseLong(user.getUsername());
 		settingService.removeReportTime(memberId, timeId);
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
-	}
-
-	@Operation(summary = "데일리 리포트 수신 시간 추가 api",
-		description = "<p>데일리 리포트 시간은 최대 3개까지 추가 가능합니다."
-			+ "<p>아무것도 추가하지 않고 리포트 발신을 키면, default로 11:00이 기본 설정됩니다.")
-	@PostMapping("/daily-report/time")
-	public CustomResponse<Void> addReportTime(
-		@AuthenticationPrincipal PrincipalUserDetails principal,
-		@Valid @RequestBody MemberSettingRequest.ReportTimeRequest request
-	) {
-		LocalTime time = request.toLocalTime();
-		settingService.addReportTime(principal.getMemberId(), time);
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
-	}
-
-	@Operation(summary = "데일리리포트 수신 시간 삭제", description = "timeId는 데일리리포트의 PK id를 의미합니다.")
-	@DeleteMapping("/time/{timeId}")
-	public CustomResponse<Void> removeReportTime(
-		@AuthenticationPrincipal UserDetails user,
-		@PathVariable Long timeId
-	) {
-		Long memberId = Long.parseLong(user.getUsername());
-		settingService.removeReportTime(memberId, timeId);
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 }
