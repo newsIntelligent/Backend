@@ -66,16 +66,16 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Long id = ((Number) claims.get("id")).longValue();
+        Long memberId = claims.get("id", Long.class);
         String email = claims.getSubject();
         String role  = claims.get("role", String.class);
         if (role == null) role = "ROLE_USER";
 
-        // 권한은 SimpleGrantedAuthority로 명시
-        var authorities = List.of(new SimpleGrantedAuthority(role));
-        var principal = new User(email, "", authorities);
+        // principal user details로 변경
+        PrincipalUserDetails principal =
+                new PrincipalUserDetails(memberId, email, List.of(new SimpleGrantedAuthority(role)));
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
     }
 
     public static String resolveToken(HttpServletRequest request) {
