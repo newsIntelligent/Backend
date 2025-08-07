@@ -7,14 +7,7 @@ import java.util.List;
 
 import UMC.news.newsIntelligent.domain.dailyReport.DailyReport;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import lombok.*;
 
@@ -23,14 +16,29 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Table(
+		uniqueConstraints = {
+				@UniqueConstraint(name = "uk_member_email", columnNames = "email"),
+				@UniqueConstraint(name = "uk_member_nickname", columnNames = "nickname")
+		}
+)
 public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// 식별용 이메일 (로그인/회원가입)
 	@Column(nullable = false, unique = true)
 	private String email;
+
+	// 알림 수신용 이메일 (기본: 가입 이메일)
+	@Column(nullable = false)
+	private String notificationEmail;
+
+	// 닉네임: 가입 시 이메일 @앞부분으로 자동 설정
+	@Column(nullable = false, unique = true)
+	private String nickname;
 
 	// 마지막 로그인 시각 (OTP 갱신용)
 	private LocalDateTime lastLoginAt;
@@ -50,19 +58,19 @@ public class Member extends BaseEntity {
 	private Boolean isDeactivated;
 
 	// 데일리 리포트
+	@Builder.Default
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
 		orphanRemoval = true,
 		fetch = FetchType.LAZY)
-	@Builder.Default
 	private List<DailyReport> dailyReports = new ArrayList<>();
 
+	@Builder.Default
 	@OneToMany(
 		mappedBy = "member",
 		cascade = CascadeType.ALL,
 		orphanRemoval = true)
-	@Builder.Default
 	private List<MemberTopic> memberTopics = new ArrayList<>();
 
 	public static Member newMember(String email) {
@@ -78,14 +86,16 @@ public class Member extends BaseEntity {
 	public void updateLastLogin() {
 		this.lastLoginAt = LocalDateTime.now();
 	}
-
 	public void deactivate() {
 		this.isDeactivated = true;
 	}
 	public boolean isDeactivated() {
 		return Boolean.TRUE.equals(isDeactivated);
 	}
-	public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
+	public void changeNotificationEmail(String email) { this.notificationEmail = email; }
+	public void changeNickname(String nickname) { this.nickname = nickname; }
+
+    public void setSubscribeTopicAlert(Boolean subscribeTopicAlert) {
 		this.subscribeTopicAlert = subscribeTopicAlert;
 	}
 	public void setReadTopicAlert(Boolean readTopicAlert) {

@@ -1,11 +1,12 @@
 package UMC.news.newsIntelligent.domain.mail.entity;
 
+import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
+import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,24 +14,27 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@IdClass(OtpCode.PK.class)
-public class OtpCode {
+public class NotificationEmailChange extends BaseEntity {
 
     @Id
-    private String email;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id @Enumerated(EnumType.STRING)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
+    private Member member;  // 변경을 요청한 회원
+
     @Column(nullable = false)
-    private Type type;      // SIGNUP, LOGIN
+    private String newEmail;    // 변경할 새 알림 이메일 (인증할 대상)
 
     @Column(nullable = false)
     private String code;    // 6자리 인증 코드
 
     @Column(nullable = false)
-    private String token;    // 매직링크용 토큰
+    private String token;   // 매직링크용 토큰
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private LocalDateTime expiresAt;    // 만료 시각
 
     /** 완료 플래그:
      * otp code나 매직링크 둘 중 하나로 검증되면 true
@@ -38,14 +42,6 @@ public class OtpCode {
     @Column(nullable = false) @Builder.Default
     private Boolean verified = false;
 
-    public enum Type { SIGNUP, LOGIN; }
-
-    @Getter @Setter
-    @NoArgsConstructor @AllArgsConstructor
-    public static class PK implements Serializable {
-        private String email;
-        private Type type;
-    }
 
     public void validateUsable() {
         if (Boolean.TRUE.equals(verified))
@@ -56,4 +52,12 @@ public class OtpCode {
 
     public void markVerified() { this.verified = true; }
 
+    // 갱신 메서드
+    public void refresh(String newEmail, String code, String token, LocalDateTime expiresAt) {
+        this.newEmail  = newEmail;
+        this.code      = code;
+        this.token     = token;
+        this.expiresAt = expiresAt;
+        this.verified  = false;
+    }
 }

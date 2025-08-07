@@ -18,7 +18,7 @@ import UMC.news.newsIntelligent.domain.member.dto.MemberSettingRequest;
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.service.MemberSettingServiceImpl;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,7 +42,7 @@ public class MemberSettingController {
 		@RequestBody MemberSettingRequest.ToggleRequest request
 	) {
 		settingService.setSubscribeNotification(principal.getMemberId(), request.getEnabled());
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
 	@Operation(summary = "읽은 토픽 변경사항 알림 설정(on/off)",
@@ -53,7 +53,7 @@ public class MemberSettingController {
 		@RequestBody MemberSettingRequest.ToggleRequest request
 	) {
 		settingService.setReadTopicNotification(principal.getMemberId(), request.getEnabled());
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
 	@Operation(summary = "데일리 리포트 발신 여부 설정(on/off)",
@@ -64,7 +64,7 @@ public class MemberSettingController {
 		@RequestBody MemberSettingRequest.ToggleRequest request
 	) {
 		settingService.setDailyReportSend(principal.getMemberId(), request.getEnabled());
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
 	@Operation(summary = "전체 알림 설정 상태 조회 api", description = "마이페이지 내의 전체 알림 설정 상태를 조회합니다.")
@@ -73,7 +73,31 @@ public class MemberSettingController {
 		@AuthenticationPrincipal PrincipalUserDetails principal
 	) {
 		MemberSettingResponse response = settingService.getAllSettings(principal.getMemberId());
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, response);
+		return CustomResponse.onSuccess(SuccessCode.OK, response);
+	}
+
+	@Operation(summary = "데일리 리포트 수신 시간 추가 api",
+		description = "<p>데일리 리포트 시간은 최대 3개까지 추가 가능합니다."
+			+ "<p>아무것도 추가하지 않고 리포트 발신을 키면, default로 11:00이 기본 설정됩니다.")
+	@PostMapping("/daily-report/time")
+	public CustomResponse<Void> addReportTime(
+		@AuthenticationPrincipal PrincipalUserDetails principal,
+		@Valid @RequestBody MemberSettingRequest.ReportTimeRequest request
+	) {
+		LocalTime time = request.toLocalTime();
+		settingService.addReportTime(principal.getMemberId(), time);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
+	}
+
+	@Operation(summary = "데일리리포트 수신 시간 삭제", description = "timeId는 데일리리포트의 PK id를 의미합니다.")
+	@DeleteMapping("/time/{timeId}")
+	public CustomResponse<Void> removeReportTime(
+		@AuthenticationPrincipal UserDetails user,
+		@PathVariable Long timeId
+	) {
+		Long memberId = Long.parseLong(user.getUsername());
+		settingService.removeReportTime(memberId, timeId);
+		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
 	}
 
 	@Operation(summary = "데일리 리포트 수신 시간 추가 api",

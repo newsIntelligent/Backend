@@ -1,6 +1,8 @@
 package UMC.news.newsIntelligent.global.config.security.jwt;
 
-import UMC.news.newsIntelligent.global.config.properties.Constants;
+import UMC.news.newsIntelligent.domain.member.repository.RevokedTokenRepository;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -17,6 +18,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwt;
+    private final RevokedTokenRepository revokedTokenRepository;
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -25,7 +28,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = JwtTokenProvider.resolveToken(request);
         if (token != null && jwt.validate(token)) {
-            SecurityContextHolder.getContext().setAuthentication(jwt.getAuthentication(token));
+
+            String jwtId = jwt.getJwtId(token);
+
+            // 해당 jwtId가 revokedToken에 있으면 무효화 처리
+            if (revokedTokenRepository.existsByJwtId(jwtId)) {
+                throw new CustomException(ErrorCode.INVALID_TOKEN);
+            }
+
+            // 정상 토큰이면 Authentication 설정
+            Authentication auth = jwt.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         chain.doFilter(request, response);
     }

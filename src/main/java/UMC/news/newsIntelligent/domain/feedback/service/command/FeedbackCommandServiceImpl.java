@@ -6,7 +6,7 @@ import UMC.news.newsIntelligent.domain.feedback.entity.Feedback;
 import UMC.news.newsIntelligent.domain.feedback.repository.FeedbackRepository;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class FeedbackCommandServiceImpl implements FeedbackCommandService {
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_404));
 
         Feedback feedback = Feedback.builder()
                 .member(member)

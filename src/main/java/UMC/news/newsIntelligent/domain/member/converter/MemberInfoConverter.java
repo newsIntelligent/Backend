@@ -3,28 +3,21 @@ package UMC.news.newsIntelligent.domain.member.converter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberInfoDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class MemberInfoConverter {
-    private MemberInfoConverter() {}   // 인스턴스화 방지
 
-    public static MemberInfoDto toDto(Member member) {
-        return new MemberInfoDto(
-                member.getEmail(),
-                member.getSubscribeTopicAlert(),
-                member.getReadTopicAlert(),
-                member.getDailyReportAlert(),
-                member.getCreatedAt(),
-                member.getUpdatedAt(),
-                member.getIsDeactivated()
-        );
-    }
+    public static MemberInfoDto.MemberInfoResponse toDto(Member member) {
+        return MemberInfoDto.MemberInfoResponse.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .notificationEmail(member.getNotificationEmail())
+                .nickname(member.getNickname())
+                .subscribe_topic_alert(member.getSubscribeTopicAlert())
+                .read_topic_alert(member.getReadTopicAlert())
+                .daily_report_alert(member.getDailyReportAlert())
+                .is_deactivated(member.isDeactivated())
+                .createdAt(member.getCreatedAt())
+                .updatedAt(member.getUpdatedAt())
+                .build();
 
-    /* entity -> dto  */
-    public static List<MemberInfoDto> toDtoList(List<Member> members) {
-        return members.stream()
-                .map(MemberInfoConverter::toDto)
-                .collect(Collectors.toList());
     }
 }

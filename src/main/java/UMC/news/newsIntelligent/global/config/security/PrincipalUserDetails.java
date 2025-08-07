@@ -6,7 +6,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -15,11 +14,10 @@ public class PrincipalUserDetails implements UserDetails {
 
     private final Long memberId;
     private final String email;
-    private final Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return List.of(() -> "ROLE_USER");
     }
 
     // 비밀번호 인증 사용 X

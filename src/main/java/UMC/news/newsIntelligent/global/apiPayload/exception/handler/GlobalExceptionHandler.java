@@ -2,7 +2,7 @@ package UMC.news.newsIntelligent.global.apiPayload.exception.handler;
 
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.BaseErrorCode;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
 
-        BaseErrorCode validationErrorCode = GeneralErrorCode.VALIDATION_FAILED;
+        BaseErrorCode validationErrorCode = ErrorCode.VALIDATION_FAILED;
 
         CustomResponse<Map<String, String>> errorResponse = CustomResponse.onFailure(
                 validationErrorCode.getStatus(),
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<CustomResponse<String>> handleGeneralException(Exception ex) {
         log.error("[WARNING] Internal Server Error : {}", ex.getMessage());
 
-        BaseErrorCode errorCode = GeneralErrorCode.INTERNAL_SERVER_ERROR_500;
+        BaseErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR_500;
 
         // 코드/메시지 기반 실패 응답 생성 방식 통일
         CustomResponse<String> errorResponse = CustomResponse.onFailure(

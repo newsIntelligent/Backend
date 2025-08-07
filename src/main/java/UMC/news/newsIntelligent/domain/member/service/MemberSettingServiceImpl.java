@@ -11,7 +11,7 @@ import UMC.news.newsIntelligent.domain.dailyReport.repository.DailyReportReposit
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
-import UMC.news.newsIntelligent.global.apiPayload.code.error.GeneralErrorCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 
 	private Member findMember(Long memberId) {
 		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+			.orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
 	@Override
@@ -76,13 +76,13 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
 		// 시간 추가 최대 3개
 		if(existing.size() >= 3) {
-			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+			throw new CustomException(ErrorCode.VALIDATION_FAILED);
 		}
 		// 시간 중복 추가 방지 검증
 		boolean dup = existing.stream()
 			.anyMatch(dr -> dr.getReportTime().equals(reportTime));
 		if (dup) {
-			throw new CustomException(GeneralErrorCode.VALIDATION_FAILED);
+			throw new CustomException(ErrorCode.VALIDATION_FAILED);
 		}
 		DailyReport report = DailyReport.of(m, reportTime);
 		dailyReportRepository.save(report);
@@ -91,9 +91,9 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 	@Override
 	public void removeReportTime(Long memberId, Long timeId) {
 		DailyReport report = dailyReportRepository.findById(timeId)
-			.orElseThrow(() -> new CustomException(GeneralErrorCode.DAILY_REPORT_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.DAILY_REPORT_NOT_FOUND));
 		if (!report.getMember().getId().equals(memberId)) {
-			throw new CustomException(GeneralErrorCode.FORBIDDEN_403);
+			throw new CustomException(ErrorCode.FORBIDDEN_403);
 		}
 		dailyReportRepository.delete(report);
 	}

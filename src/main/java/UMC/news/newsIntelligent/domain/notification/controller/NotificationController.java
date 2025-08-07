@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.service.NotificationService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
-import UMC.news.newsIntelligent.global.apiPayload.code.success.GeneralSuccessCode;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class NotificationController {
 		NotificationResponse.NotificationCursorDto body =
 			notificationService.getNotifications(memberId, cursor, size);
 
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, body);
+		return CustomResponse.onSuccess(SuccessCode.OK, body);
 	}
 
 	@Operation(summary = "단건 알림 읽음 처리",
@@ -51,7 +50,7 @@ public class NotificationController {
 	) {
 		Long memberId = principal.getMemberId();
 		notificationService.markAsRead(memberId, notificationId);
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
 	@Operation(summary = "모든 알림 읽음 처리",
@@ -62,7 +61,7 @@ public class NotificationController {
 	) {
 		Long memberId = principal.getMemberId();
 		notificationService.markAllAsRead(memberId);
-		return CustomResponse.onSuccess(GeneralSuccessCode.OK, null);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
 }
