@@ -9,7 +9,8 @@ WORKDIR /app
 COPY . .
 
 # 빌드 실행 (테스트 생략)
-RUN gradle clean build -x test
+RUN chmod +x ./gradlew
+RUN ./gradlew clean build -x test
 
 # Run Stage
 FROM openjdk:17-jdk-slim
