@@ -14,10 +14,11 @@ public class PrincipalUserDetails implements UserDetails {
 
     private final Long memberId;
     private final String email;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(() -> "ROLE_USER");
+        return authorities;
     }
 
     // 비밀번호 인증 사용 X

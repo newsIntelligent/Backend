@@ -42,7 +42,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         (requests) -> requests
-                                .requestMatchers("/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(
                                         "/api/members/signup/**",
                                         "/api/members/login/**"
@@ -62,10 +62,9 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
-                "http://localhost:5173",    // 로컬 개발 환경
+                "http://localhost:5173",
                 "https://newsintelligent.site",
                 "https://www.newsintelligent.site",
-                "https://api.newsintelligent.site",
                 "https://api.newsintelligent.site"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
