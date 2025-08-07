@@ -14,20 +14,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(
-        uniqueConstraints = @UniqueConstraint(
-                name = "uk_email_change_member",
-                columnNames = "member_id"
-        )
-)
 public class NotificationEmailChange extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "member_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id", nullable = false, unique = true)
     private Member member;  // 변경을 요청한 회원
 
     @Column(nullable = false)
