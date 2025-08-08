@@ -5,6 +5,7 @@ import UMC.news.newsIntelligent.domain.member.repository.RevokedTokenRepository;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtAuthenticationFilter;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.List;
 
@@ -33,7 +35,8 @@ public class SecurityConfig {
     private final RevokedTokenRepository revokedTokenRepository;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .formLogin(AbstractHttpConfigurer::disable)
@@ -53,7 +56,7 @@ public class SecurityConfig {
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(
-                        new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenRepository),
+                        new JwtAuthenticationFilter(jwtTokenProvider, revokedTokenRepository, resolver),
                         UsernamePasswordAuthenticationFilter.class
                 );
         return http.build();
