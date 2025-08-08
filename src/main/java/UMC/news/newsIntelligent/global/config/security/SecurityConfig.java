@@ -7,6 +7,7 @@ import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,6 +43,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         (requests) -> requests
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()     // preflight(OPTIONS) 허용
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(
                                         "/api/members/signup/**",
@@ -67,10 +69,8 @@ public class SecurityConfig {
                 "https://www.newsintelligent.site",
                 "https://api.newsintelligent.site"
         ));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Authorization"));
-
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
