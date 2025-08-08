@@ -44,7 +44,7 @@ public class MailService {
     public void sendOtpMail(String to, String code, String token, OtpCode.Type type) {
         String path  = (type == OtpCode.Type.SIGNUP) ? "/signup/magic" : "/login/magic";
         String link = baseUrl() + path + "?token=" + token;
-        String html = EmailHtmlTemplate.renderOtpVerify(hyphenateCode(code), link);
+        String html = EmailHtmlTemplate.renderOtp(hyphenateCode(code), link);
         sendHtml(to, "[NewsIntelligent] 이메일 주소 확인", html);
     }
 
