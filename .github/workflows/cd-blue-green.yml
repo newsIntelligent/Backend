@@ -1,0 +1,100 @@
+name: News Intelligent CD - Deploy to AWS EC2
+
+on:
+  workflow_run:
+    # CI 성공 시 수행
+    workflows:
+      - "News Intelligent CI"
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository at CI commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 1
+
+      - name: Check required files (compose & nginx)
+        run: |
+          echo "HEAD SHA: ${{ github.event.workflow_run.head_sha }}"
+          ls -al
+              test -f docker-compose-prod.yml || (echo "compose file missing" && exit 1)
+              test -f infra/nginx/api.conf.tpl || (echo "nginx tpl missing" && exit 1)
+
+      - name: Prepare remote dir
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_SERVER_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            mkdir -p ~/${{ secrets.REPOSITORY_PATH }}/infra/nginx
+
+      - name: Upload compose file & nginx tpl
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_SERVER_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          source: |
+            docker-compose-prod.yml
+            infra/nginx/api.conf.tpl
+          target: "~/${{ secrets.REPOSITORY_PATH }}/"
+
+      - name: Blue/Green deploy to EC2
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+        with:
+          host: ${{ secrets.EC2_SERVER_IP }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY
+
+          script: |
+            set -eo pipefail
+            cd ~/${{ secrets.REPOSITORY_PATH }}
+
+            ACTIVE_PORT=$(grep -oE '127\.0\.0\.1:([0-9]+)' /etc/nginx/conf.d/api.newsintelligent.site.conf 2>/dev/null | tail -1 | cut -d: -f2 || echo 8081)
+            if [ "$ACTIVE_PORT" = "8081" ]; then NEW_PORT=8082; else NEW_PORT=8081; fi
+            if [ "$NEW_PORT" = "8081" ]; then NEW_COLOR=blue; OLD_COLOR=green; else NEW_COLOR=green; OLD_COLOR=blue; fi
+
+            echo "ACTIVE_PORT=$ACTIVE_PORT, NEW_PORT=$NEW_PORT"
+            echo "NEW_COLOR=$NEW_COLOR, OLD_COLOR=$OLD_COLOR"
+            
+            export IMAGE_TAG=$IMAGE_TAG
+            export DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME
+            export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
+            
+            APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml pull
+            APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml up -d --force-recreate
+            
+            for i in {1..30}; do
+              if curl -fsS "http://127.0.0.1:${NEW_PORT}/actuator/health/readiness" | grep -q '"status":"UP"'; then
+                echo "New ${NEW_COLOR} healthy"; break
+              fi
+              echo "waiting health... ($i)"
+              sleep 2
+            done
+
+            if ! curl -fsS "http://127.0.0.1:${NEW_PORT}/actuator/health/readiness" | grep -q '"status":"UP"'; then
+              echo "New ${NEW_COLOR} failed to become healthy"
+              APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml logs --tail=200 || true
+              exit 1
+            fi
+            
+            sudo sh -c "sed 's/\\${APP_PORT}/${NEW_PORT}/g' infra/nginx/api.conf.tpl > /etc/nginx/conf.d/api.newsintelligent.site.conf"
+            sudo nginx -t
+            sudo systemctl reload nginx
+            
+            APP_PORT=$ACTIVE_PORT docker-compose -p app_${OLD_COLOR} -f docker-compose-prod.yml down || true
+            
+            docker image prune -f
