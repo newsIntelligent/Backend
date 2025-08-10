@@ -8,6 +8,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_HOST_FRONT: https://newsintelligent.site
+      SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
       SPRING_APPLICATION_JSON: >
         {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}},
                  "management":{"endpoint":{"health":{"probes":{"enabled":true}}},
