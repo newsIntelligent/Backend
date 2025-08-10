@@ -7,12 +7,38 @@ services:
       - .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SERVER_HOST_FRONT: https://newsintelligent.site
+
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
       MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+
       MANAGEMENT_METRICS_BINDERS_PROCESSOR_ENABLED: "false"
+
+      # JVM 메모리/GC 안전장치
+      JAVA_TOOL_OPTIONS: >-
+        -XX:+UseContainerSupport
+        -XX:MaxRAMPercentage=60.0
+        -XX:InitialRAMPercentage=60.0
+        -XX:+ExitOnOutOfMemoryError
+        -XX:+HeapDumpOnOutOfMemoryError
+        -XX:HeapDumpPath=/tmp/heap.hprof
+
+      # 스레드/DB 커넥션 폭주 방지
+      SERVER_TOMCAT_THREADS_MAX: "100"
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "10"
+
+      SERVER_HOST_FRONT: https://newsintelligent.site
       SPRING_APPLICATION_JSON: >
         {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
+
     ports:
       - "${APP_PORT:-8081}:8080"   # BLUE=8081 / GREEN=8082
-    restart: always
+
+    restart: unless-stopped
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.80"
+          memory: 768M
+        reservations:
+          memory: 256M
