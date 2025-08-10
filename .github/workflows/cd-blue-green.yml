@@ -34,6 +34,7 @@ jobs:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+          command_timeout: 30m
           script: |
             mkdir -p ~/${{ secrets.REPOSITORY_PATH }}
 
@@ -60,10 +61,14 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY,NGINX_API_CONF_TPL
+          command_timeout: 30m
 
           script: |
             set -eo pipefail
             cd ~/${{ secrets.REPOSITORY_PATH }}
+            
+           
+            docker ps -q -f name=backend-app-1 | xargs -r docker rm -f || true
 
             ACTIVE_PORT=$(grep -oE '127\.0\.0\.1:([0-9]+)' /etc/nginx/conf.d/api.newsintelligent.site.conf 2>/dev/null | tail -1 | cut -d: -f2 || echo 8081)
             if [ "$ACTIVE_PORT" = "8081" ]; then NEW_PORT=8082; else NEW_PORT=8081; fi
