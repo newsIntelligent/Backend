@@ -8,11 +8,11 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_HOST_FRONT: https://newsintelligent.site
-      SPRING_AUTOCONFIGURE_EXCLUDE: org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+      MANAGEMENT_METRICS_BINDERS_PROCESSOR_ENABLED: "false"
       SPRING_APPLICATION_JSON: >
-        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}},
-                 "management":{"endpoint":{"health":{"probes":{"enabled":true}}},
-                               "endpoints":{"web":{"exposure":{"include":"health"}}}}}
+        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
     ports:
       - "${APP_PORT:-8081}:8080"   # BLUE=8081 / GREEN=8082
     restart: always
