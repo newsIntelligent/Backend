@@ -14,19 +14,20 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      # CI한 커밋 체크아웃
       - name: Checkout repository at CI commit
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_sha }}
           fetch-depth: 1
 
-      - name: Check required files (compose & nginx)
+      # compose 파일 확인
+      - name: Check compose files
         run: |
           echo "HEAD SHA: ${{ github.event.workflow_run.head_sha }}"
-          ls -al
-              test -f docker-compose-prod.yml || (echo "compose file missing" && exit 1)
-              test -f infra/nginx/api.conf.tpl || (echo "nginx tpl missing" && exit 1)
+          test -f docker-compose-prod.yml || (echo "compose file missing" && exit 1)
 
+      # 원격 디렉토리 준비
       - name: Prepare remote dir
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -34,30 +35,31 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            mkdir -p ~/${{ secrets.REPOSITORY_PATH }}/infra/nginx
+            mkdir -p ~/${{ secrets.REPOSITORY_PATH }}
 
-      - name: Upload compose file & nginx tpl
+      # 서버에 compose 파일 업로드
+      - name: Upload compose file
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          source: |
-            docker-compose-prod.yml
-            infra/nginx/api.conf.tpl
+          source: "docker-compose-prod.yml"
           target: "~/${{ secrets.REPOSITORY_PATH }}/"
 
+      # Blue/Green 배포
       - name: Blue/Green deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
         env:
           IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+          NGINX_API_CONF_TPL: ${{ secrets.NGINX_API_CONF_TPL }}
         with:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY
+          envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY,NGINX_API_CONF_TPL
 
           script: |
             set -eo pipefail
@@ -69,15 +71,20 @@ jobs:
 
             echo "ACTIVE_PORT=$ACTIVE_PORT, NEW_PORT=$NEW_PORT"
             echo "NEW_COLOR=$NEW_COLOR, OLD_COLOR=$OLD_COLOR"
-            
+
             export IMAGE_TAG=$IMAGE_TAG
             export DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME
             export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
-            
-            APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml pull
-            APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml up -d --force-recreate
-            
-            for i in {1..30}; do
+
+            APP_PORT=$NEW_PORT APP_COLOR=$NEW_COLOR \
+            DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY IMAGE_TAG=$IMAGE_TAG \
+            docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml pull
+
+            APP_PORT=$NEW_PORT APP_COLOR=$NEW_COLOR \
+            DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY IMAGE_TAG=$IMAGE_TAG \
+            docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml up -d --force-recreate
+
+            for i in $(seq 1 30); do
               if curl -fsS "http://127.0.0.1:${NEW_PORT}/actuator/health/readiness" | grep -q '"status":"UP"'; then
                 echo "New ${NEW_COLOR} healthy"; break
               fi
@@ -87,14 +94,18 @@ jobs:
 
             if ! curl -fsS "http://127.0.0.1:${NEW_PORT}/actuator/health/readiness" | grep -q '"status":"UP"'; then
               echo "New ${NEW_COLOR} failed to become healthy"
-              APP_PORT=$NEW_PORT docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml logs --tail=200 || true
+              APP_PORT=$NEW_PORT APP_COLOR=$NEW_COLOR docker-compose -p app_${NEW_COLOR} -f docker-compose-prod.yml logs --tail=200 || true
               exit 1
             fi
-            
-            sudo sh -c "sed 's/\\${APP_PORT}/${NEW_PORT}/g' infra/nginx/api.conf.tpl > /etc/nginx/conf.d/api.newsintelligent.site.conf"
+
+            sudo mkdir -p /etc/nginx/templates
+            printf '%s' "$NGINX_API_CONF_TPL" | sudo tee /etc/nginx/templates/api.conf.tpl >/dev/null
+
+            sudo sh -c "sed 's/\\${APP_PORT}/${NEW_PORT}/g' /etc/nginx/templates/api.conf.tpl > /etc/nginx/conf.d/api.newsintelligent.site.conf"
             sudo nginx -t
             sudo systemctl reload nginx
-            
-            APP_PORT=$ACTIVE_PORT docker-compose -p app_${OLD_COLOR} -f docker-compose-prod.yml down || true
-            
+
+            APP_PORT=$ACTIVE_PORT APP_COLOR=$OLD_COLOR \
+            docker-compose -p app_${OLD_COLOR} -f docker-compose-prod.yml down || true
+
             docker image prune -f

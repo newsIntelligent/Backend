@@ -1,6 +1,7 @@
 services:
   app:
     image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPOSITORY}:${IMAGE_TAG}
+    container_name: app-${APP_COLOR:-blue}
     pull_policy: always
     env_file:
       - .env
@@ -8,7 +9,9 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_HOST_FRONT: https://newsintelligent.site
       SPRING_APPLICATION_JSON: >
-        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
+        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}},
+                 "management":{"endpoint":{"health":{"probes":{"enabled":true}}},
+                               "endpoints":{"web":{"exposure":{"include":"health"}}}}}
     ports:
-      - "${APP_PORT}:8080"   # BLUE=8081 / GREEN=8082
+      - "${APP_PORT:-8081}:8080"   # BLUE=8081 / GREEN=8082
     restart: always
