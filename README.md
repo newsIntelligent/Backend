@@ -1,4 +1,7 @@
 # News Intelligent
+![ni-readme-img](https://github.com/user-attachments/assets/c7fdffcb-6808-42f8-9f05-be84b1379fd4)
+
+<br />
 
 ## 👩🏻‍💻 팀원 소개
 
@@ -9,11 +12,69 @@
 <br />
 
 ## 💡 기술 스택
-
+- Java 17
+- Spring Boot 3.5.3
+- Spring Data JPA
+- MySQL 8.0.36
+- Docker, DockerHub
+- GitHub Actions
+- AWS EC2, AWS RDS, AWS S3
+- Prometheus, Grafana
+  
 <br />
 
 ## 📋 ERD
+<img width="1770" height="1122" alt="news_erd (1)" src="https://github.com/user-attachments/assets/726aa02a-f887-4fce-acb6-3b34c373a60a" />
 
 <br />
 
 ## ☁️ 시스템 아키텍처
+
+<br />
+
+## 🌱 브랜치 전략
+- `develop`
+- `main`
+- `feature/기능명` or `feature/#관련이슈번호`
+
+<br />
+
+## 🖍️ Issue 
+- Feature : 기능 개발 시
+- Refactor : 코드 개선 시
+- Bug : 오류 수정 시
+
+<br />
+
+## 📂 폴더 구조
+```
+📂 backend
+├── 📂 domain
+│    ├── 📂 member
+│    │   ├── 📂 controller
+│    │   ├── 📂 converter
+│    │   ├── 📂 dto
+│    │   ├── 📂 entity
+│    │   ├── 📂 repository
+│    │   ├── 📂 service
+│    ├── 📂 news
+│    ├── 📂 topic
+│    ├── 📂 newsCategory
+│    └── 📂 ..
+│
+├── 📂 global
+│    ├── 📂 apiPayload
+│    │   ├── 📂 code
+│    │   |   ├── 📂 error
+│    │   |   ├── 📂 success
+│    │   ├── 📂 exception
+│    │   |   ├── 📂 handler
+│    │   |   ├── CustomException
+│    ├── 📂 config
+│    │   |   ├── 📂 properties
+│    │   |   ├── 📂 security
+│    │   |   ├── 📂 ..
+│    ├── 📂 entity
+│    └──   |   ├── BaseEntity 
+```
+
