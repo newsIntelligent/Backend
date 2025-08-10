@@ -13,7 +13,7 @@ RUN chmod +x ./gradlew
 RUN ./gradlew clean build -x test
 
 # Run Stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 ENV TZ=Asia/Seoul
 
