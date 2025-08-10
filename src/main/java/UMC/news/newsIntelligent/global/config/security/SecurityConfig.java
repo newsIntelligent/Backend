@@ -52,6 +52,9 @@ public class SecurityConfig {
                                         "/api/members/signup/**",
                                         "/api/members/login/**"
                                 ).permitAll()
+                                .requestMatchers(
+                                        "/actuator/health/**"
+                                ).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)

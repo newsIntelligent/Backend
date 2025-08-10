@@ -10,5 +10,5 @@ services:
       SPRING_APPLICATION_JSON: >
         {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:8080"   # BLUE=8081 / GREEN=8082
     restart: always
