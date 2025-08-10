@@ -2,6 +2,8 @@ services:
   app:
     image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPOSITORY}:${IMAGE_TAG}
     pull_policy: always
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_HOST_FRONT: https://newsintelligent.site
