@@ -14,6 +14,12 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: List workspace & check compose file
+        run: |
+          pwd
+          ls -al
+          test -f docker-compose-prod.yml || (echo "compose file not found" && exit 1)
+
       - name: Prepare remote dir
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -31,30 +37,23 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           source: "docker-compose-prod.yml"
           target: "~/${{ secrets.REPOSITORY_PATH }}/"
+          overwrite: true
+          strip_components: 0
 
-      # EC2에 배포
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.0
-
         env:
           IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
         with:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          envs: IMAGE_TAG,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY
+          envs: IMAGE_TAG
 
           script: |
             set -eo pipefail
             cd ~/${{ secrets.REPOSITORY_PATH }}
-
-            export IMAGE_TAG="$IMAGE_TAG"
-            export DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME"
-            export DOCKERHUB_REPOSITORY="$DOCKERHUB_REPOSITORY"
-
-            docker-compose -f docker-compose-prod.yml pull
-            docker-compose -f docker-compose-prod.yml up -d --force-recreate --remove-orphans
-
+            export IMAGE_TAG=$IMAGE_TAG
+            docker compose -f docker-compose-prod.yml pull
+            docker compose -f docker-compose-prod.yml up -d --force-recreate --remove-orphans
             docker image prune -f
