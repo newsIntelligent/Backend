@@ -2,7 +2,6 @@ name: News Intelligent CD - Deploy to AWS EC2
 
 on:
   workflow_run:
-    # CI 성공 시 수행
     workflows:
       - "News Intelligent CI"
     types:
@@ -10,7 +9,7 @@ on:
 
 jobs:
   deploy:
-    if: ${{github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-22.04
 
     steps:
@@ -34,7 +33,6 @@ jobs:
           host: ${{ secrets.EC2_SERVER_IP }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_PRIVATE_KEY }}
-          command_timeout: 30m
           script: |
             mkdir -p ~/${{ secrets.REPOSITORY_PATH }}
 
@@ -66,9 +64,6 @@ jobs:
           script: |
             set -eo pipefail
             cd ~/${{ secrets.REPOSITORY_PATH }}
-            
-           
-            docker ps -q -f name=backend-app-1 | xargs -r docker rm -f || true
 
             ACTIVE_PORT=$(grep -oE '127\.0\.0\.1:([0-9]+)' /etc/nginx/conf.d/api.newsintelligent.site.conf 2>/dev/null | tail -1 | cut -d: -f2 || echo 8081)
             if [ "$ACTIVE_PORT" = "8081" ]; then NEW_PORT=8082; else NEW_PORT=8081; fi
@@ -104,12 +99,18 @@ jobs:
             fi
 
             sudo mkdir -p /etc/nginx/templates
-            printf '%s' "$NGINX_API_CONF_TPL" | sudo tee /etc/nginx/templates/api.conf.tpl >/dev/null
+            printf '%s\n' "$NGINX_API_CONF_TPL" | sudo tee /etc/nginx/templates/api.conf.tpl >/dev/null
 
-            sudo sh -c "sed 's/\\${APP_PORT}/${NEW_PORT}/g' /etc/nginx/templates/api.conf.tpl > /etc/nginx/conf.d/api.newsintelligent.site.conf"
+            if ! command -v envsubst >/dev/null 2>&1; then
+              sudo apt-get update -y && sudo apt-get install -y gettext-base
+            fi
+
+            APP_PORT=${NEW_PORT} envsubst '${APP_PORT}' < /etc/nginx/templates/api.conf.tpl \
+              | sudo tee /etc/nginx/conf.d/api.newsintelligent.site.conf >/dev/null
+
             sudo nginx -t
             sudo systemctl reload nginx
-
+      
             APP_PORT=$ACTIVE_PORT APP_COLOR=$OLD_COLOR \
             docker-compose -p app_${OLD_COLOR} -f docker-compose-prod.yml down || true
 
