@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("jwt.token")
 public class JwtProperties {
     private String secretKey="";
-    private Expiration expiration;
+    private Expiration expiration = new Expiration();
 
     @Getter
     @Setter
     public static class Expiration {
-        private Long access;
+        private Long access = 14_400_000L;
     }
 }
