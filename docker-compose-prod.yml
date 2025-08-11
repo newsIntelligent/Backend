@@ -31,10 +31,11 @@ services:
 
       SERVER_HOST_FRONT: https://newsintelligent.site
       SPRING_APPLICATION_JSON: >
-        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
-
-      SECURITY_JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      SECURITY_JWT_EXPIRATION_ACCESS: ${JWT_ACCESS_EXPIRATION}
+        {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}},
+         "security":{"jwt":{
+            "secret-key":"${JWT_SECRET_KEY}",
+            "expiration":{"access":${JWT_ACCESS_EXPIRATION}}
+         }}}
 
     ports:
       - "8081:8080"
