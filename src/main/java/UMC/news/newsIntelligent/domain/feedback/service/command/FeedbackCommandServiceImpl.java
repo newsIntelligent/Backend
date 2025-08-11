@@ -1,6 +1,5 @@
 package UMC.news.newsIntelligent.domain.feedback.service.command;
 
-import UMC.news.newsIntelligent.domain.feedback.code.FeedbackErrorCode;
 import UMC.news.newsIntelligent.domain.feedback.dto.FeedbackRequestDTO;
 import UMC.news.newsIntelligent.domain.feedback.entity.Feedback;
 import UMC.news.newsIntelligent.domain.feedback.repository.FeedbackRepository;
@@ -22,11 +21,11 @@ public class FeedbackCommandServiceImpl implements FeedbackCommandService {
     public void submitFeedback(FeedbackRequestDTO.FeedbackRequest request, Long memberId) {
         // 피드백 내용이 null이거나 빈칸인 경우 customException 발생
         if (request.content() == null || request.content().isBlank()) {
-            throw new CustomException(FeedbackErrorCode.EMPTY_CONTENT);
+            throw new CustomException(ErrorCode.FEEDBACK_EMPTY_CONTENT);
         }
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_404));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         Feedback feedback = Feedback.builder()
                 .member(member)
