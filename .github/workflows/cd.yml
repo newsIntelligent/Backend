@@ -61,27 +61,29 @@ jobs:
           script: |
             set -eo pipefail
             cd ~/${{ secrets.REPOSITORY_PATH }}
-            
-            export IMAGE_TAG=$IMAGE_TAG
-            export DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME
-            export DOCKERHUB_REPOSITORY=$DOCKERHUB_REPOSITORY
-            
-            docker-compose -f docker-compose-prod.yml down
+
+            export IMAGE_TAG="$IMAGE_TAG"
+            export DOCKERHUB_USERNAME="$DOCKERHUB_USERNAME"
+            export DOCKERHUB_REPOSITORY="$DOCKERHUB_REPOSITORY"
+
+            docker-compose -f docker-compose-prod.yml down --remove-orphans || true
             docker-compose -f docker-compose-prod.yml pull
             docker-compose -f docker-compose-prod.yml up -d --force-recreate --remove-orphans
-            
-            for i in $(seq 1 15); do
+
+            echo "Health-check: http://127.0.0.1:8081/actuator/health/readiness"
+            for i in $(seq 1 30); do
               if curl -fsS "http://127.0.0.1:8081/actuator/health/readiness" | grep -q '"status":"UP"'; then
-                echo "App is healthy"; break
+                echo "App is healthy ✅"; break
               fi
               echo "waiting health... ($i)"
               sleep 2
             done
-            
+
             if ! curl -fsS "http://127.0.0.1:8081/actuator/health/readiness" | grep -q '"status":"UP"'; then
-              echo "App failed to become healthy"
+              echo "App failed to become healthy ❌"
+              docker-compose -f docker-compose-prod.yml ps || true
               docker-compose -f docker-compose-prod.yml logs --tail=200 || true
               exit 1
             fi
 
-            docker image prune -f
+            docker image prune -fmage prune -f
