@@ -33,6 +33,9 @@ services:
       SPRING_APPLICATION_JSON: >
         {"server":{"host":{"front":"${SERVER_HOST_FRONT}"}}}
 
+      SECURITY_JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      SECURITY_JWT_EXPIRATION_ACCESS: ${JWT_ACCESS_EXPIRATION}
+
     ports:
       - "8081:8080"
 
