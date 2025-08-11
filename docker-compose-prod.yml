@@ -33,8 +33,6 @@ services:
     ports:
       - "${APP_PORT:-8081}:8080"   # BLUE=8081 / GREEN=8082
 
-    restart: unless-stopped
-
     deploy:
       resources:
         limits:
