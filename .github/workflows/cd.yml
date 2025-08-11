@@ -73,17 +73,17 @@ jobs:
             echo "Health-check: http://127.0.0.1:8081/actuator/health/readiness"
             for i in $(seq 1 30); do
               if curl -fsS "http://127.0.0.1:8081/actuator/health/readiness" | grep -q '"status":"UP"'; then
-                echo "App is healthy ✅"; break
+                echo "App is healthy "; break
               fi
               echo "waiting health... ($i)"
               sleep 2
             done
 
             if ! curl -fsS "http://127.0.0.1:8081/actuator/health/readiness" | grep -q '"status":"UP"'; then
-              echo "App failed to become healthy ❌"
+              echo "App failed to become healthy "
               docker-compose -f docker-compose-prod.yml ps || true
               docker-compose -f docker-compose-prod.yml logs --tail=200 || true
               exit 1
             fi
 
-            docker image prune -fmage prune -f
+            docker image prune -f
