@@ -29,7 +29,7 @@
 <br />
 
 ## ☁️ 시스템 아키텍처
-<img width="1198" height="1143" alt="ni-backend-architechture-white drawio" src="https://github.com/user-attachments/assets/67a8de9c-07f2-49af-ad27-3c532a6c9769" />
+<img width="1577" height="1144" alt="ni-backend-architechture drawio" src="https://github.com/user-attachments/assets/172bf97f-fcc8-4c9a-810e-0b73264f9e0a" />
 
 <br />
 
