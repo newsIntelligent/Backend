@@ -17,4 +17,19 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
         ORDER BY t.id DESC
     """)
     Slice<Topic> findByKeywordAndCursor(@Param("keyword") String keyword, @Param("cursor") Long cursor, Pageable pageable);
+
+    @Query("""
+    SELECT t FROM Topic t
+    WHERE (
+        :cursorTime IS NULL
+        OR t.summaryTime < :cursorTime
+        OR (t.summaryTime = :cursorTime AND t.id < :cursorId)
+    )
+    ORDER BY t.summaryTime DESC, t.id DESC
+""")
+    Slice<Topic> findByCursorOrderBySummaryTimeDesc(
+            @Param("cursorTime") java.time.LocalDateTime cursorTime,
+            @Param("cursorId") Long cursorId,
+            Pageable pageable
+    );
 }
