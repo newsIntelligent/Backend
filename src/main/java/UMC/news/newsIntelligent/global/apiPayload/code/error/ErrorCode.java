@@ -41,7 +41,7 @@ public enum ErrorCode implements BaseErrorCode{
     MEMBER_NOT_FOUND (HttpStatus.BAD_REQUEST, "MEMBER404", "존재하지 않는 회원입니다."),
     NICKNAME_DUPLICATED (HttpStatus.CONFLICT, "MEMBER409", "이미 사용 중인 닉네임입니다."),
 
-    // 피드백
+    // 피드백 관련 에러
     FEEDBACK_EMPTY_CONTENT(HttpStatus.BAD_REQUEST, "4001", "피드백 내용이 비어 있습니다.");
 
     // 필요한 필드값 선언

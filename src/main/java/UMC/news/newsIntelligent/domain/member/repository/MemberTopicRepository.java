@@ -17,8 +17,8 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     SELECT mt.topic FROM MemberTopic mt
     WHERE mt.member.id = :memberId
       AND mt.isRead = true
-      AND (:keyword IS NULL OR mt.topic.topicName LIKE %:keyword%)
-      AND mt.topic.id < :cursor
+      AND (:keyword IS NULL OR LOWER(mt.topic.topicName) LIKE CONCAT('%', LOWER(:keyword), '%'))
+      AND (:cursor IS NULL OR mt.topic.id < :cursor)
     ORDER BY mt.topic.id DESC
 """)
     Slice<Topic> searchReadTopicsByKeyword(
@@ -32,7 +32,7 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     SELECT mt.topic FROM MemberTopic mt
     WHERE mt.member.id = :memberId
       AND mt.isRead = true
-      AND mt.topic.id < :cursor
+      AND (:cursor IS NULL OR mt.topic.id < :cursor)
     ORDER BY mt.topic.id DESC
 """)
     Slice<Topic> getReadTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
