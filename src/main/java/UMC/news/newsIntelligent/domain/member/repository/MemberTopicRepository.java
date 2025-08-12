@@ -41,7 +41,7 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     SELECT mt.topic FROM MemberTopic mt
     WHERE mt.member.id = :memberId
       AND mt.isSubscribe = true
-      AND mt.topic.id < :cursor
+      AND (:cursor IS NULL OR mt.topic.id < :cursor)
     ORDER BY mt.topic.id DESC
 """)
     Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
