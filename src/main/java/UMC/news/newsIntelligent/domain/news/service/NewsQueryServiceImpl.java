@@ -53,15 +53,20 @@ public class NewsQueryServiceImpl implements NewsQueryService{
             throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
         }
 
-        // 같은 topic_id의 기사만 오므로 첫 번째에서 topic_id 획득
+        // 최신순 정렬
+        latestNews.sort(
+                Comparator.comparing(News::getPublishDate)
+                        .thenComparing(News::getId)
+                        .reversed()
+        );
+
         Long topicId = latestNews.get(0).getTopic().getId();
 
-        // 대표 기사: id가 가장 큰 기사(안정적인 결정)
+        // 대표 기사: 가장 최신(동일시간일 시 id가 큰 것으로)
         News main = latestNews.stream()
                 .max(Comparator.comparing(News::getId))
                 .orElse(latestNews.get(0));
 
-        // relatedArticles 구성
         List<NewsResponseDTO.NewsRelatedArticleDto> related = latestNews.stream()
                 .map(n -> new NewsResponseDTO.NewsRelatedArticleDto(
                         n.getId(),
@@ -77,7 +82,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                 topicId,
                 main.getTitle(),
                 main.getNewsSummary(),
-                main.getPublishDate(),   // DTO 필드명: publish_date
+                main.getPublishDate(),
                 related
         );
 
