@@ -5,10 +5,13 @@ import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.UUID;
@@ -23,7 +26,9 @@ public class MailService {
     @Value("${spring.mail.username}") private String from;
     @Value("${server.host.front}") private String frontUrl;
 
-    public String generateCode() {
+    public String getFrontBaseUrl() { return baseUrl(); }
+
+	public String generateCode() {
         return String.format("%06d", new SecureRandom().nextInt(1_000_000));
     }
     public String generateToken() {
@@ -65,6 +70,26 @@ public class MailService {
             mailSender.send(msg);
         } catch (Exception e) {
             throw new IllegalStateException("메일 발송 실패", e);
+        }
+    }
+
+    /** 데일리리포트: 프로젝트 내부 로고를 인라인 첨부 **/
+    public void sendDailyReport(String to, String html) {
+        try {
+            MimeMessage msg = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject("[NewsIntelligent] Daily-Report");
+            helper.setFrom(new InternetAddress(from, "NewsIntelligent"));
+            helper.setText(html, true);
+
+            // classpath: src/main/resources/mail/logo-mail.png
+            ClassPathResource logo = new ClassPathResource("mail/logo-mail.png");
+            helper.addInline("mailLogo", logo, "image/png");
+
+            mailSender.send(msg);
+        } catch (Exception e) {
+            throw new IllegalStateException("데일리리포트 메일 발송 실패", e);
         }
     }
 }

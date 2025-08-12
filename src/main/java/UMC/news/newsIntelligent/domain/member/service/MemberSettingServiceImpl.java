@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import UMC.news.newsIntelligent.domain.dailyReport.DailyReport;
+import UMC.news.newsIntelligent.domain.dailyReport.entity.DailyReport;
 import UMC.news.newsIntelligent.domain.dailyReport.repository.DailyReportRepository;
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.entity.Member;

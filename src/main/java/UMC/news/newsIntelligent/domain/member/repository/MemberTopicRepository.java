@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -47,6 +49,14 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
     Optional<MemberTopic> findByMemberIdAndTopicId(Long memberId, Long topicId);
-    boolean existsByMemberIdAndTopicId(Long memberId, Long topicId);
-    void deleteByMemberIdAndTopicId(Long memberId, Long topicId);
+
+    @Query("""
+        select t
+          from MemberTopic mt
+          join mt.topic t
+         where mt.member.id = :memberId
+           and mt.isSubscribe = true
+         order by t.updatedAt desc
+    """)
+    Page<Topic> findSubscribedTopicsOrderByUpdatedDesc(@Param("memberId") Long memberId, Pageable pageable);
 }
