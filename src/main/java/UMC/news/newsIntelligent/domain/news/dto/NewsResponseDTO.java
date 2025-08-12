@@ -2,6 +2,7 @@ package UMC.news.newsIntelligent.domain.news.dto;
 
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class NewsResponseDTO {
@@ -22,7 +23,7 @@ public class NewsResponseDTO {
             String title,
             String newsSummary,
             String newsLink,
-            String publishDate,
+            LocalDateTime publishDate,
             String press,
             String imageUrl,
             String imageSource
@@ -34,7 +35,7 @@ public class NewsResponseDTO {
             String title,
             String newsSummary,
             String newLink,
-            String publishDate
+            LocalDateTime publishDate
     ) {}
 
     // “조건을 만족하는 토픽 묶음 중 최신 1개” 반환용 DTO
@@ -43,7 +44,7 @@ public class NewsResponseDTO {
             String title,
             String newsSummary,
             String imageUrl,
-            String publish_date,
+            LocalDateTime publishDate,
             List<NewsRelatedArticleDto> relatedArticles
     ) {}
 }
