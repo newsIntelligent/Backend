@@ -31,7 +31,19 @@ public class TopicQueryServiceImpl implements TopicQueryService {
         Pageable pageable = PageRequest.of(0, size);
         Slice<Topic> topicSlice = topicRepository.findByKeywordAndCursor(keyword, cursor, pageable);
 
-        return getTopicPreviewListResDTO(topicSlice);
+        List<TopicResponseDTO.TopicPreviewResDTO> topicList = topicSlice.stream()
+                .map(TopicConverter::toPreviewResDTO)
+                .toList();
+
+        Long nextCursor = (topicSlice.hasNext() && !topicList.isEmpty())
+                ? topicList.get(topicList.size() - 1).id()
+                : null;
+
+        return TopicResponseDTO.TopicPreviewListResDTO.builder()
+                .cursor(nextCursor)
+                .hasNext(topicSlice.hasNext())
+                .topics(topicList)
+                .build();
     }
 
     private Long normalizeCursor(Long cursor) {
@@ -89,21 +101,5 @@ public class TopicQueryServiceImpl implements TopicQueryService {
                 topic.getImageUrl(),
                 topic.getSummaryTime()
         );
-    }
-
-    private TopicResponseDTO.TopicPreviewListResDTO getTopicPreviewListResDTO(Slice<Topic> topicSlice) {
-        List<TopicResponseDTO.TopicPreviewResDTO> topicList = topicSlice.stream()
-                .map(TopicConverter::toPreviewResDTO)
-                .toList();
-
-        Long nextCursor = (topicSlice.hasNext() && !topicList.isEmpty())
-                ? topicList.get(topicList.size() - 1).id()
-                : null;
-
-        return TopicResponseDTO.TopicPreviewListResDTO.builder()
-                .cursor(nextCursor)
-                .hasNext(topicSlice.hasNext())
-                .topics(topicList)
-                .build();
     }
 }
