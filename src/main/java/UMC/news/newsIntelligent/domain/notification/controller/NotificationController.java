@@ -1,13 +1,10 @@
 package UMC.news.newsIntelligent.domain.notification.controller;
 
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.service.NotificationService;
@@ -61,6 +58,17 @@ public class NotificationController {
 	) {
 		Long memberId = principal.getMemberId();
 		notificationService.markAllAsRead(memberId);
+		return CustomResponse.onSuccess(SuccessCode.OK, null);
+	}
+
+	@PostMapping("/ping")
+	@PermitAll
+	@SecurityRequirements(value = {})
+	@Operation(
+			summary = "데이터 수집 파이프라인 Ping",
+			description = "파이썬에서 사이클 완료 신호를 보낼 때 사용하는 엔드포인트입니다. **파이썬 전용 api이므로 절대 호출하시면 안됩니다!!**"
+	)
+	public CustomResponse<Void> ping() {
 		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 
