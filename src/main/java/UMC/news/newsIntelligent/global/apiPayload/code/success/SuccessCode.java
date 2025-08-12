@@ -28,8 +28,10 @@ public enum SuccessCode implements BaseSuccessCode{
     // 토픽
     GET_TOPIC(HttpStatus.OK, "TOPIC200", "토픽 상세 페이지 조회가 완료되었습니다."),
     GET_NEWS(HttpStatus.OK, "NEWS200", "토픽 출처 기사 목록 조회가 완료되었습니다."),
-    GET_LATEST_TOPIC(HttpStatus.OK, "TOPIC200", "최신 수정 보도 조회가 완료되었습니다.")
-    ;
+    GET_LATEST_TOPIC(HttpStatus.OK, "TOPIC200", "최신 수정 보도 조회가 완료되었습니다."),
+
+    // 피드백
+    FEEDBACK_CREATED(HttpStatus.CREATED, "FEEDBACK2001", "성공적으로 피드백이 생성했습니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -1,10 +1,10 @@
 package UMC.news.newsIntelligent.domain.feedback.controller;
 
-import UMC.news.newsIntelligent.domain.feedback.code.FeedbackSuccessCode;
 import UMC.news.newsIntelligent.domain.feedback.dto.FeedbackRequestDTO;
 import UMC.news.newsIntelligent.domain.feedback.service.command.FeedbackCommandService;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
+import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +34,7 @@ public class FeedbackController {
             ) {
         try {
             feedbackCommandService.submitFeedback(request, principal.getMemberId());
-            return CustomResponse.onSuccess(FeedbackSuccessCode.FEEDBACK_CREATED);
+            return CustomResponse.onSuccess(SuccessCode.FEEDBACK_CREATED);
 
         } catch (CustomException e) {
             return CustomResponse.onFailure(e.getCode());

@@ -12,8 +12,8 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     // topicName 을 기준으로 keyword 검색 & 커서 페이지네이션 구현
     @Query("""
         SELECT t FROM Topic t
-        WHERE (:keyword IS NULL OR t.topicName LIKE %:keyword%)
-          AND t.id < :cursor
+        WHERE (:keyword IS NULL OR LOWER(t.topicName) LIKE CONCAT('%', LOWER(:keyword), '%'))
+          AND (:cursor IS NULL OR t.id < :cursor)
         ORDER BY t.id DESC
     """)
     Slice<Topic> findByKeywordAndCursor(@Param("keyword") String keyword, @Param("cursor") Long cursor, Pageable pageable);
