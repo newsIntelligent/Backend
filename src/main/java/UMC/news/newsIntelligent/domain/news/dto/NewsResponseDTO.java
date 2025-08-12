@@ -24,7 +24,8 @@ public class NewsResponseDTO {
             String newsSummary,
             String newsLink,
             LocalDateTime publishDate,
-            String press
+            String press,
+            String pressLogoUrl
     ) {}
 
     public record NewsRelatedArticleDto (

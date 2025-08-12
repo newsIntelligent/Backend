@@ -1,8 +1,11 @@
 package UMC.news.newsIntelligent.domain.news.service;
 
+import UMC.news.newsIntelligent.domain.news.converter.NewsConverter;
 import UMC.news.newsIntelligent.domain.news.entity.News;
 import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
+import UMC.news.newsIntelligent.domain.news.entity.PressLogo;
 import UMC.news.newsIntelligent.domain.news.repository.NewsRepository;
+import UMC.news.newsIntelligent.domain.news.repository.PressLogoRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -10,14 +13,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class NewsQueryServiceImpl implements NewsQueryService{
 
     private final NewsRepository newsRepository;
+    private final PressLogoRepository pressLogoRepository;
 
     @Override
     public NewsResponseDTO.NewsResDTO getRelatedNews(Long topicId, Long lastId, int size) {
@@ -26,16 +32,22 @@ public class NewsQueryServiceImpl implements NewsQueryService{
         List<News> newsList = newsRepository.findByTopicIdWithPaging(topicId, lastId, pageable);
         int totalCount = newsRepository.countByTopicId(topicId);
 
-        List<NewsResponseDTO.NewsListResDTO> content = newsList.stream()
-                .map(n -> new NewsResponseDTO.NewsListResDTO(
-                        n.getId(),
-                        n.getTitle(),
-                        n.getNewsSummary(),
-                        n.getNewsLink(),
-                        n.getPublishDate(),
-                        n.getPress()
-                ))
-                .toList();
+        // 이번 페이지 언론사만 수집
+        var presses = newsList.stream()
+                .map(News::getPress)
+                .filter(p -> p != null && !p.isBlank())
+                .collect(java.util.stream.Collectors.toSet());
+
+        Map<String, String> logoMap = java.util.Collections.emptyMap();
+        if (!presses.isEmpty()) {
+            logoMap = pressLogoRepository.findByPressIn(presses).stream()
+                    .collect(java.util.stream.Collectors.toMap(PressLogo::getPress, PressLogo::getLogoImage));
+        }
+
+        // 기본 로고
+        String DEFAULT_LOGO = null;
+
+        List<NewsResponseDTO.NewsListResDTO> content = NewsConverter.toListResDTOs(newsList, logoMap, DEFAULT_LOGO);
 
         Long newLastId = content.isEmpty() ? null : content.get(content.size() - 1).id();
         boolean hasNext = newsList.size() == size;
@@ -43,13 +55,12 @@ public class NewsQueryServiceImpl implements NewsQueryService{
         return new NewsResponseDTO.NewsResDTO(content, totalCount, newLastId, size, hasNext);
     }
 
-
     // 최신 수정 보도 (조건 만족 + 같은 topic_id로 3개 이상 중 '기사 수가 가장많은' 토픽 1개)
     @Override
     public NewsResponseDTO.TopicQualifiedItemResDTO getLatestTopicNews() throws CustomException {
         List<News> latestNews = newsRepository.findArticlesOfTopTopicByCount();
 
-        if(latestNews.isEmpty()){
+        if (latestNews.isEmpty()) {
             throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
         }
 
@@ -62,21 +73,10 @@ public class NewsQueryServiceImpl implements NewsQueryService{
 
         Long topicId = latestNews.get(0).getTopic().getId();
 
-        // 대표 기사: 가장 최신(동일시간일 시 id가 큰 것으로)
-        News main = latestNews.stream()
-                .max(Comparator.comparing(News::getId))
-                .orElse(latestNews.get(0));
+        // 대표 기사: 정렬 결과의 첫 번째(= 가장 최신 기사)
+        News main = latestNews.get(0);
 
-        List<NewsResponseDTO.NewsRelatedArticleDto> related = latestNews.stream()
-                .map(n -> new NewsResponseDTO.NewsRelatedArticleDto(
-                        n.getId(),
-                        n.getPress(),
-                        n.getTitle(),
-                        n.getNewsSummary(),
-                        n.getNewsLink(),
-                        n.getPublishDate()
-                ))
-                .toList();
+        List<NewsResponseDTO.NewsRelatedArticleDto> related = NewsConverter.toRelatedDtos(latestNews);
 
         return new NewsResponseDTO.TopicQualifiedItemResDTO(
                 topicId,
