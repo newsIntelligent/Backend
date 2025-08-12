@@ -8,7 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import UMC.news.newsIntelligent.domain.notification.Notification;
+import UMC.news.newsIntelligent.domain.notification.entity.Notification;
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.repository.NotificationRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;

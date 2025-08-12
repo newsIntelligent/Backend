@@ -1,6 +1,5 @@
 package UMC.news.newsIntelligent.domain.notification.repository;
 
-import java.awt.print.Pageable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import UMC.news.newsIntelligent.domain.notification.Notification;
+import UMC.news.newsIntelligent.domain.notification.entity.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 	List<Notification> findByMemberIdOrderByCreatedAtAsc(Long memberId);

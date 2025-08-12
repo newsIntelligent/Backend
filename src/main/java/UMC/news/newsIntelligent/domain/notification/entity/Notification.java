@@ -1,4 +1,4 @@
-package UMC.news.newsIntelligent.domain.notification;
+package UMC.news.newsIntelligent.domain.notification.entity;
 
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
