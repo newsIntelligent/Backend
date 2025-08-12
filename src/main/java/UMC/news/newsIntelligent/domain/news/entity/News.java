@@ -46,13 +46,6 @@ public class News {
     @Column(nullable = false)
     private String press;
 
-    // 주제 이미지
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String imageUrl;
-
-    @Column(columnDefinition = "TEXT")
-    private String imageSource;
-
     // 최신수정보도를 위한 컬럼 추가
     @Column(name = "is_new", nullable = false)
     private boolean isNew;      // 기본값 false

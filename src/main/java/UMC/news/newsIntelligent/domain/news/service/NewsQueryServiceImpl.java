@@ -33,9 +33,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                         n.getNewsSummary(),
                         n.getNewsLink(),
                         n.getPublishDate(),
-                        n.getPress(),
-                        n.getImageUrl(),
-                        n.getImageSource()
+                        n.getPress()
                 ))
                 .toList();
 
@@ -79,7 +77,6 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                 topicId,
                 main.getTitle(),
                 main.getNewsSummary(),
-                main.getImageUrl(),
                 main.getPublishDate(),   // DTO 필드명: publish_date
                 related
         );

@@ -24,9 +24,7 @@ public class NewsResponseDTO {
             String newsSummary,
             String newsLink,
             LocalDateTime publishDate,
-            String press,
-            String imageUrl,
-            String imageSource
+            String press
     ) {}
 
     public record NewsRelatedArticleDto (
@@ -43,7 +41,6 @@ public class NewsResponseDTO {
             Long id,                     // topic_id
             String title,
             String newsSummary,
-            String imageUrl,
             LocalDateTime publishDate,
             List<NewsRelatedArticleDto> relatedArticles
     ) {}
