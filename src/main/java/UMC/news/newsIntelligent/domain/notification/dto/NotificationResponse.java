@@ -44,17 +44,13 @@ public class NotificationResponse {
 		private Boolean isChecked;
 		private String createdAt;
 
-		// '2011-12-03T10:15:30+01:00' 형식의 포매터
-		private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-
-		// Notification entity -> Dto
 		public static NotificationDto of(Notification notification) {
 
 			return NotificationDto.builder()
 				.content(notification.getContent())
 				.type(notification.getNotificationType())
 				.isChecked(notification.getIsChecked())
-				.createdAt(notification.getCreatedAt().format(FORMATTER))
+				.createdAt(String.valueOf(notification.getCreatedAt()))
 				.build();
 		}
 	}
