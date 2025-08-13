@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Topic extends BaseEntity {
+public class Topic {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

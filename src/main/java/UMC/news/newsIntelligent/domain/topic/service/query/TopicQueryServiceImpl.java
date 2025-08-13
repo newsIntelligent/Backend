@@ -13,6 +13,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -54,6 +55,39 @@ public class TopicQueryServiceImpl implements TopicQueryService {
         return (size < 1 || size > 10) ? 10 : size;
     }
 
+    @Override
+    public TopicResponseDTO.TopicPreviewListResDTO getTopicList(Long cursor, int size) {
+        size = normalizeSize(size);
+
+        Pageable pageable = PageRequest.of(0, size);
+
+        LocalDateTime cursorTime = null;
+        Long cursorId = null;
+
+        // 첫 페이지: cursor == null -> 최신부터
+        if (cursor != null && cursor != 0) {
+            Topic last = topicRepository.findById(cursor).orElse(null);
+            if (last != null) {
+                cursorTime = last.getSummaryTime();
+                cursorId   = last.getId();
+            } else {
+                throw new CustomException(ErrorCode.CURSOR_INVALID);
+            }
+        }
+
+        Slice<Topic> slice = topicRepository.findByCursorOrderBySummaryTimeDesc(cursorTime, cursorId, pageable);
+
+        // 커서는 마지막 아이템의 id
+        List<TopicResponseDTO.TopicPreviewResDTO> topics = slice.getContent()
+                .stream().map(TopicConverter::toPreviewResDTO).toList();
+        Long nextCursor = (slice.hasNext() && !topics.isEmpty()) ? topics.get(topics.size()-1).id() : null;
+
+        return TopicResponseDTO.TopicPreviewListResDTO.builder()
+                .cursor(nextCursor)
+                .hasNext(slice.hasNext())
+                .topics(topics)
+                .build();
+    }
 
     @Override
     public TopicResponseDTO.TopicDetailsResDTO getTopicById(Long topicId) {

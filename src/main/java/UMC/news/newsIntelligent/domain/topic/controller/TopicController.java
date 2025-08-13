@@ -35,7 +35,7 @@ public class TopicController {
     private final MemberTopicCommandService memberTopicCommandService;
 
     /* --- 토픽 조회 --- */
-    @Operation(summary = "토픽 조회", description = "토픽을 조회하는 API입니다.")
+    @Operation(summary = "토픽 검색 결과 조회", description = "토픽 검색 결과를 조회하는 API입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토픽 조회 성공")
     })
@@ -46,6 +46,22 @@ public class TopicController {
             @RequestParam(defaultValue = "10") @Max(10) int size
     ) {
         TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.searchTopics(keyword, cursor, size);
+
+        return CustomResponse.onSuccess(topicResDTO);
+    }
+
+    @Operation(
+            summary = "토픽 목록(홈화면) 조회",
+            description = "<p>최신순으로 토픽 목록을 조회하는 API입니다."
+                    + "<p>응답의 마지막 아이템 id를 다음 요청의 cursor 값으로 전달하면 됩니다."
+                    + "<p>첫 페이지 조회 시에는 cursor를 비우거나 0으로 설정하세요."
+    )
+    @GetMapping("/home")
+    public CustomResponse<TopicResponseDTO.TopicPreviewListResDTO> getTopics(
+            @RequestParam(required = false) Long cursor,
+            @RequestParam(defaultValue = "10") @Max(10) int size
+    ) {
+        TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.getTopicList(cursor, size);
 
         return CustomResponse.onSuccess(topicResDTO);
     }
