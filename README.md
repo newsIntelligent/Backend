@@ -24,7 +24,8 @@
 <br />
 
 ## 📋 ERD
-<img width="1770" height="1122" alt="news_erd (2)" src="https://github.com/user-attachments/assets/4a98ac49-6043-4986-bb47-5d1230679cb0" />
+<img width="1670" height="1122" alt="news_erd (3)" src="https://github.com/user-attachments/assets/96a6fac6-d411-413b-acc2-d2ad56269814" />
+
 
 
 <br />
@@ -33,6 +34,7 @@
 <img width="1577" height="1144" alt="ni-backend-architechture drawio" src="https://github.com/user-attachments/assets/172bf97f-fcc8-4c9a-810e-0b73264f9e0a" />
 
 <br />
+
 
 ## 🌱 브랜치 전략
 - `develop`
