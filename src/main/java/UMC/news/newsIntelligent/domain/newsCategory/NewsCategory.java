@@ -1,6 +1,6 @@
 package UMC.news.newsIntelligent.domain.newsCategory;
 
-import UMC.news.newsIntelligent.domain.news.News;
+import UMC.news.newsIntelligent.domain.news.entity.News;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

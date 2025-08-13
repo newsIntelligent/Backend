@@ -25,8 +25,11 @@ public enum ErrorCode implements BaseErrorCode{
     // 알림 에러
     NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION400", "해당 알림을 찾을 수 없습니다."),
     // 토픽 관련 에러
-    TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC400", "해당 토픽을 찾을 수 없습니다."),
+    TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC404_1", "해당 토픽을 찾을 수 없습니다."),
     MEMBERTOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC401", "해당 멤버와 관계를 가진 토픽을 찾을 수 없습니다."),
+    // 최신 수정 보도 관련 에러
+    LATEST_NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "TOPIC404_2", "기사 수 3개 이상을 만족하는 최신 수정 보도가 없습니다."),
+
     // 데일리 리포트 관련 에러
     DAILY_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "데일리 리포트를 찾을 수 없습니다."),
 
