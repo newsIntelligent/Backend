@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import static UMC.news.newsIntelligent.domain.mail.entity.OtpCode.Type.LOGIN;
@@ -115,12 +116,20 @@ public class AuthService {
             throw new CustomException(ErrorCode.OTP_WRONG);
 
         String token = jwtTokenProvider.generateAccessToken(member.getId(), member.getEmail(), "ROLE_USER");
+
         Date exp = jwtTokenProvider.getExpiration(token);
+        ZoneId KST = ZoneId.of("Asia/Seoul");
+        String expIsoKst = exp.toInstant()
+                .atZone(KST)
+                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
         member.updateLastLogin();
         otpCodeRepository.delete(otpCode);
 
-        return TokenResponseDto.builder().accessToken(token).expiresAt(exp.toInstant()).build();
+        return TokenResponseDto.builder()
+                .accessToken(token)
+                .expiresAt(expIsoKst)
+                .build();
     }
 
     /* 회원가입 매직링크 검증 */
