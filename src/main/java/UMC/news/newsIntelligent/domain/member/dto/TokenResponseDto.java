@@ -7,5 +7,5 @@ import java.time.Instant;
 @Builder
 public record TokenResponseDto(
         String accessToken,
-        Instant expiresAt
+        String expiresAt
 ) {}
