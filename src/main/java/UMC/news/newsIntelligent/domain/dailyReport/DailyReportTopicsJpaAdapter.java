@@ -67,7 +67,7 @@ public class DailyReportTopicsJpaAdapter implements DailyReportTopicsPort {
 	private DailyReportEmailTemplate.TopicCard toCard(Topic t) {
 		String base = mailService.getFrontBaseUrl();
 		String link = base + "/topics/" + t.getId();
-		String meta = "업데이트 " + META_TIME_FMT.format(t.getUpdatedAt());
+		String meta = "업데이트 " + META_TIME_FMT.format(t.getSummaryTime());
 		String title = t.getTopicName();
 		String summary = safeSummary(t);
 		String imageUrl = t.getImageUrl();

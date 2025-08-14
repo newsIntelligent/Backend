@@ -41,7 +41,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
     @Query("""
         select t
           from Topic t
-         order by t.updatedAt desc
+         order by t.summaryTime desc
     """)
     Page<Topic> findAllOrderByUpdatedDesc(Pageable pageable);
 
@@ -50,7 +50,7 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
         select t
           from Topic t
          where t.id not in :excludeIds
-         order by t.updatedAt desc
+         order by t.summaryTime desc
     """)
     Page<Topic> findAllExcludingIdsOrderByUpdatedDesc(@Param("excludeIds") Collection<Long> excludeIds, Pageable pageable);
 }

@@ -56,7 +56,7 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
           join mt.topic t
          where mt.member.id = :memberId
            and mt.isSubscribe = true
-         order by t.updatedAt desc
+         order by t.summaryTime desc
     """)
     Page<Topic> findSubscribedTopicsOrderByUpdatedDesc(@Param("memberId") Long memberId, Pageable pageable);
 }
