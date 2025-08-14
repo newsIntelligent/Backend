@@ -19,7 +19,7 @@
 - Docker, DockerHub
 - GitHub Actions
 - AWS EC2, AWS RDS, AWS S3
-- Prometheus, Grafana
+- AWS CloudWatch, AWS SNS, Grafana Cloud
   
 <br />
 
