@@ -1,6 +1,10 @@
 package UMC.news.newsIntelligent.domain.topic.repository;
 
+import java.util.Collection;
+
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +36,21 @@ public interface TopicRepository extends JpaRepository<Topic, Long> {
             @Param("cursorId") Long cursorId,
             Pageable pageable
     );
+
+    /** 최신 토픽 페이징 */
+    @Query("""
+        select t
+          from Topic t
+         order by t.updatedAt desc
+    """)
+    Page<Topic> findAllOrderByUpdatedDesc(Pageable pageable);
+
+    /** 최신 순 페이징 (구독 섹션과 중복 제거용) */
+    @Query("""
+        select t
+          from Topic t
+         where t.id not in :excludeIds
+         order by t.updatedAt desc
+    """)
+    Page<Topic> findAllExcludingIdsOrderByUpdatedDesc(@Param("excludeIds") Collection<Long> excludeIds, Pageable pageable);
 }

@@ -4,8 +4,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import UMC.news.newsIntelligent.domain.notification.Notification;
-import UMC.news.newsIntelligent.domain.notification.NotificationType;
+import UMC.news.newsIntelligent.domain.notification.entity.Notification;
+import UMC.news.newsIntelligent.domain.notification.entity.NotificationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import UMC.news.newsIntelligent.domain.dailyReport.DailyReport;
+import UMC.news.newsIntelligent.domain.dailyReport.entity.DailyReport;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.*;
 

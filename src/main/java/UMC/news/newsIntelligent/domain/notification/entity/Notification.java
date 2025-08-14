@@ -1,11 +1,11 @@
-package UMC.news.newsIntelligent.domain.dailyReport;
-
-import java.time.LocalTime;
+package UMC.news.newsIntelligent.domain.notification.entity;
 
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,7 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,24 +21,27 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
-public class DailyReport extends BaseEntity {
+public class Notification extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@Column(nullable = false)
+	private String content;
+
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private NotificationType notificationType;
+
+	@Column(nullable = false)
+	private Boolean isChecked;
+
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
-	@Column(nullable = false)
-	private LocalTime reportTime;
-
-	public static DailyReport of(Member member, LocalTime reportTime) {
-		return DailyReport.builder()
-			.member(member)
-			.reportTime(reportTime)
-			.build();
+	public void setChecked(Boolean checked) {
+		isChecked = checked;
 	}
 }
