@@ -78,6 +78,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                 topicId,
                 main.getTitle(),
                 main.getNewsSummary(),
+                main.getTopic().getImageUrl(),
                 main.getPublishDate(),
                 related
         );
