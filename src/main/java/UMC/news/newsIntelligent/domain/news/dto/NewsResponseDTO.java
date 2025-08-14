@@ -39,9 +39,10 @@ public class NewsResponseDTO {
 
     // “조건을 만족하는 토픽 묶음 중 최신 1개” 반환용 DTO
     public record TopicQualifiedItemResDTO(
-            Long id,                     // topic_id
+            Long id,
             String title,
             String newsSummary,
+            String imageUrl,
             LocalDateTime publishDate,
             List<NewsRelatedArticleDto> relatedArticles
     ) {}
