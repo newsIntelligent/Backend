@@ -1,13 +1,14 @@
 package UMC.news.newsIntelligent.domain.news.repository;
 
-import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
 import UMC.news.newsIntelligent.domain.news.entity.News;
+import UMC.news.newsIntelligent.domain.news.repository.projection.OldestPerTopicProjection;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, Long> {
 
@@ -54,6 +55,26 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     """, nativeQuery = true)
     List<News> findTop3QualifiedNewsByTopicId(@Param("topicId") Long topicId);
 
+    @Query("""
+SELECT n.topic.id AS topicId, n.press AS press, n.title AS title
+FROM News n
+WHERE n.topic.id IN :topicIds
+  AND n.publishDate = (
+      SELECT MIN(n2.publishDate)
+      FROM News n2
+      WHERE n2.topic.id = n.topic.id
+  )
+  AND n.id = (
+      SELECT MAX(n3.id)
+      FROM News n3
+      WHERE n3.topic.id = n.topic.id
+        AND n3.publishDate = n.publishDate
+  )
+""")
+    List<OldestPerTopicProjection> findOldestPerTopic(java.util.Collection<Long> topicIds);
+
+    // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 큰 기사
+    Optional<News> findFirstByTopicIdOrderByPublishDateAscIdDesc(Long topicId);
 }
 //    @Query(value = """
 //    SELECT n.*

@@ -15,7 +15,8 @@ public class TopicResponseDTO {
             String topicName,
             String aiSummary,
             LocalDateTime summaryTime,
-            String imageUrl
+            String imageUrl,
+            ImageSource imageSource
     ) {}
 
     @Builder
@@ -23,5 +24,11 @@ public class TopicResponseDTO {
             Long cursor,
             Boolean hasNext,
             List<TopicPreviewResDTO> topics
+    ) {}
+
+    @Builder
+    public record ImageSource(
+            String press,
+            String title
     ) {}
 }
