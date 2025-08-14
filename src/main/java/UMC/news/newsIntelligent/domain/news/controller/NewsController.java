@@ -43,7 +43,7 @@ public class NewsController {
             @RequestParam(defaultValue = "3") int size
     ) {
         NewsResponseDTO.NewsResDTO response = newsQueryServiceImpl.getRelatedNews(topicId, lastId, size);
-        return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, response);
+        return CustomResponse.onSuccess(SuccessCode.GET_NEWS, response);
     }
 
     @Operation(summary = "최신 수정 보도 조회 API", description = "최신 수정된 기사 수가 3개 이상인 최신 토픽 하나를 반환합니다.")
@@ -53,7 +53,7 @@ public class NewsController {
     @GetMapping("/latest")
     public CustomResponse<NewsResponseDTO.TopicQualifiedItemResDTO> getLatestTopic() {
         NewsResponseDTO.TopicQualifiedItemResDTO latestTopicNews = newsQueryServiceImpl.getLatestTopicNews();
-        return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, latestTopicNews);
+        return CustomResponse.onSuccess(SuccessCode.GET_LATEST_TOPIC, latestTopicNews);
     }
 
 }

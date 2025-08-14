@@ -2,10 +2,13 @@ package UMC.news.newsIntelligent.domain.news.service;
 
 import UMC.news.newsIntelligent.domain.news.converter.NewsConverter;
 import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
+//import UMC.news.newsIntelligent.domain.news.entity.News;
 import UMC.news.newsIntelligent.domain.news.entity.News;
 import UMC.news.newsIntelligent.domain.news.entity.PressLogo;
 import UMC.news.newsIntelligent.domain.news.repository.NewsRepository;
 import UMC.news.newsIntelligent.domain.news.repository.PressLogoRepository;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
+import UMC.news.newsIntelligent.domain.topic.repository.TopicRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
     private static final int MAX_PAGE_SIZE = 20;
     private static final String DEFAULT_LOGO = null; // 기본 로고
 
+    private final TopicRepository topicRepository;
     private final NewsRepository newsRepository;
     private final PressLogoRepository pressLogoRepository;
 
@@ -51,55 +55,32 @@ public class NewsQueryServiceImpl implements NewsQueryService{
         return new NewsResponseDTO.NewsResDTO(content, totalCount, newLastId, pageSize, hasNext);
     }
 
-    // 최신 수정 보도 (조건 만족 + 같은 topic_id로 3개 이상 중 '기사 수가 가장많은' 토픽 1개)
+    // 최신 수정 보도 (조건 만족 + 같은 topic_id로 1개 이상인 토픽 1개)
     @Override
     public NewsResponseDTO.TopicQualifiedItemResDTO getLatestTopicNews() throws CustomException {
-        List<News> latestNews = newsRepository.findArticlesOfTopTopicByCount();
-
-        if (latestNews.isEmpty()) {
-            throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
+        Long qualifiedTopic = newsRepository.pickTopTopicIdByQualifiedNews();
+        if (qualifiedTopic == null) {
+            throw new CustomException(ErrorCode.TOPIC_NOT_FOUND);
         }
 
-        // 최신순 정렬
-        latestNews.sort(
-                Comparator.comparing(News::getPublishDate)
-                        .thenComparing(News::getId)
-                        .reversed()
-        );
+        Topic topic = topicRepository.findById(qualifiedTopic)
+                .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
-        Long topicId = latestNews.get(0).getTopic().getId();
-
-        // 대표 기사: 정렬 결과의 첫 번째(= 가장 최신 기사)
-        News main = latestNews.get(0);
-
-        List<NewsResponseDTO.NewsRelatedArticleDto> related = NewsConverter.toRelatedDtos(latestNews);
+        List<News> relatedNewsEntity = newsRepository.findTop3QualifiedNewsByTopicId(qualifiedTopic);
+        if (relatedNewsEntity.isEmpty()) {
+            throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
+        }
+        List<NewsResponseDTO.NewsRelatedArticleDto> relatedNews =
+                NewsConverter.toRelatedDtos(relatedNewsEntity);
 
         return new NewsResponseDTO.TopicQualifiedItemResDTO(
-                topicId,
-                main.getTitle(),
-                main.getNewsSummary(),
-                main.getTopic().getImageUrl(),
-                main.getPublishDate(),
-                related
+                topic.getId(),
+                topic.getTopicName(),
+                topic.getAiSummary(),
+                topic.getImageUrl(),
+                topic.getSummaryTime(),
+                relatedNews
         );
-
-//        // topic_id 단위로 그룹핑
-//        Map<Long, List<News>> byTopic = latestNews.stream()
-//                .collect(Collectors.groupingBy(n -> n.getTopic().getId(), LinkedHashMap::new, Collectors.toList()));
-//
-//        // 개수가 가장 많은 토픽 그룹 선택 (동률이면 첫 그룹)
-//        Map.Entry<Long, List<News>> mostCountGroup = byTopic.entrySet().stream()
-//                .max(Comparator.comparingInt(e -> e.getValue().size()))
-//                .orElseThrow(() -> new CustomException(GeneralErrorCode.LATEST_NEWS_NOT_FOUND));
-//
-//        Long topicId = mostCountGroup.getKey();
-//        List<News> items = mostCountGroup.getValue();
-//
-//        // 대표 기사: id가 가장 큰 기사
-//        News main = items.stream()
-//                .max(Comparator.comparing(News::getId))
-//                .orElse(items.get(0));
-
     }
 
     private static int normalizeSize(int size) {

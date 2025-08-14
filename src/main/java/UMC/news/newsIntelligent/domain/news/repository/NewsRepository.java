@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.news.repository;
 
+import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
 import UMC.news.newsIntelligent.domain.news.entity.News;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,37 +25,51 @@ public interface NewsRepository extends JpaRepository<News, Long> {
 
     int countByTopicId(Long topicId);
 
-//    @Query(value = """
-//        SELECT *
-//        FROM news n
-//        WHERE n.is_new = 1
-//          AND n.is_third = 0
-//          AND n.topic_id IN (
-//            SELECT topic_id
-//            FROM news
-//            WHERE is_new = 1 AND is_third = 0
-//            GROUP BY topic_id
-//            HAVING COUNT(*) >= 3
-//          )
-//        ORDER BY n.topic_id, n.publish_date
-//        """, nativeQuery = true)
-//    List<News> findLatestNews();
-
+    //토픽은 1개 (is_new true, is_third false)를 만족하는 뉴스가 단 하나라도 있다면 선택
     @Query(value = """
-    SELECT n.*
-    FROM news n
-    JOIN (
-        SELECT topic_id
-        FROM news
-        WHERE is_new = 1
-          AND is_third = 0
-        GROUP BY topic_id
-        HAVING COUNT(*) >= 3
-        ORDER BY COUNT(*) DESC, MAX(id) DESC   -- 동률이면 id 큰 토픽 우선
+        SELECT n.topic_id
+        FROM news n
+        WHERE n.is_new = 1
+          AND n.is_third = 0
+        GROUP BY n.topic_id
+        ORDER BY COUNT(*) DESC, MAX(n.id) DESC
         LIMIT 1
-    ) t ON t.topic_id = n.topic_id
-    WHERE n.is_new = 1
-      AND n.is_third = 0
     """, nativeQuery = true)
-    List<News> findArticlesOfTopTopicByCount();
+    Long pickTopTopicIdByQualifiedNews();
+
+    /**
+     * 토픽은 1개 (is_new true, is_third false)를 만족하는 뉴스가 단 하나라도 있다면 선택
+     * 해당 토픽의 기사 3개를 반환하는데, 그중 하나는 (is_new true, is_third false)이 조건을 만족함
+     * 나머지 2개는 조건 무관하게 최신순으로 리턴 기준 완화하려했으나,
+     * sql구문이 매우 복잡해지고 잘못된 값을 불러서.. (is_new true, is_third false)를 만족하는 뉴스만큼 리턴함
+     */
+    @Query(value = """
+        SELECT n.*
+        FROM news n
+        WHERE n.topic_id = :topicId
+          AND n.is_new = 1
+          AND n.is_third = 0
+        ORDER BY n.publish_date DESC, n.id DESC
+        LIMIT 3
+    """, nativeQuery = true)
+    List<News> findTop3QualifiedNewsByTopicId(@Param("topicId") Long topicId);
+
 }
+//    @Query(value = """
+//    SELECT n.*
+//    FROM news n
+//    JOIN (
+//        SELECT topic_id
+//        FROM news
+//        WHERE is_new = 1
+//          AND is_third = 0
+//        GROUP BY topic_id
+//        HAVING COUNT(*) >= 3
+//        ORDER BY COUNT(*) DESC, MAX(id) DESC   -- 동률이면 id 큰 토픽 우선
+//        LIMIT 1
+//    ) t ON t.topic_id = n.topic_id
+//    WHERE n.is_new = 1
+//      AND n.is_third = 0
+//    """, nativeQuery = true)
+//    List<News> findArticlesOfTopTopicByCount();
+
