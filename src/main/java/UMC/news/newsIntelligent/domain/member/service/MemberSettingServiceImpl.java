@@ -76,13 +76,13 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
 		// 시간 추가 최대 3개
 		if(existing.size() >= 3) {
-			throw new CustomException(ErrorCode.VALIDATION_FAILED);
+			throw new CustomException(ErrorCode.ADD_TIME_EXCEED_MAXIMUM);
 		}
 		// 시간 중복 추가 방지 검증
 		boolean dup = existing.stream()
 			.anyMatch(dr -> dr.getReportTime().equals(reportTime));
 		if (dup) {
-			throw new CustomException(ErrorCode.VALIDATION_FAILED);
+			throw new CustomException(ErrorCode.ADD_TIME_OVERLAP);
 		}
 		DailyReport report = DailyReport.of(m, reportTime);
 		dailyReportRepository.save(report);
@@ -93,7 +93,7 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		DailyReport report = dailyReportRepository.findById(timeId)
 			.orElseThrow(() -> new CustomException(ErrorCode.DAILY_REPORT_NOT_FOUND));
 		if (!report.getMember().getId().equals(memberId)) {
-			throw new CustomException(ErrorCode.FORBIDDEN_403);
+			throw new CustomException(ErrorCode.MEMBER_NOT_FOUND);
 		}
 		dailyReportRepository.delete(report);
 	}
