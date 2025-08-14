@@ -46,9 +46,8 @@ public class NewsQueryServiceImpl implements NewsQueryService{
 
         Map<String, String> logoMap = loadPressLogos(pageItems);
 
-        List<NewsResponseDTO.NewsListResDTO> content = pageItems.stream()
-                .map(n -> NewsConverter.toListResDTO(n, logoFor(n.getPress(), logoMap)))
-                .toList();
+        List<NewsResponseDTO.NewsListResDTO> content =
+                NewsConverter.toListResDTOs(pageItems, press -> logoFor(press, logoMap));
 
         Long newLastId = content.isEmpty() ? null : content.get(content.size() - 1).id();
 
@@ -73,14 +72,16 @@ public class NewsQueryServiceImpl implements NewsQueryService{
         List<NewsResponseDTO.NewsRelatedArticleDto> relatedNews =
                 NewsConverter.toRelatedDtos(relatedNewsEntity);
 
-        return new NewsResponseDTO.TopicQualifiedItemResDTO(
-                topic.getId(),
-                topic.getTopicName(),
-                topic.getAiSummary(),
-                topic.getImageUrl(),
-                topic.getSummaryTime(),
-                relatedNews
-        );
+        // 출처 기사
+        var source = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(qualifiedTopic);
+        NewsResponseDTO.ImageSource imageSource = source
+                .map(n -> NewsResponseDTO.ImageSource.builder()
+                        .press(n.getPress())
+                        .title(n.getTitle())
+                        .build())
+                .orElse(null);
+
+        return NewsConverter.toTopicQualifiedItem(topic, imageSource, relatedNews);
     }
 
     private static int normalizeSize(int size) {

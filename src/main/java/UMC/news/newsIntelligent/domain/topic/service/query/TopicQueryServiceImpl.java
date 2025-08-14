@@ -76,12 +76,12 @@ public class TopicQueryServiceImpl implements TopicQueryService {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
-        News oldest = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId).orElse(null);
+        News source = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId).orElse(null);
 
-        TopicResponseDTO.ImageSource imageSource = (oldest == null) ? null
+        TopicResponseDTO.ImageSource imageSource = (source == null) ? null
                 : TopicResponseDTO.ImageSource.builder()
-                .press(oldest.getPress())
-                .title(oldest.getTitle())
+                .press(source.getPress())
+                .title(source.getTitle())
                 .build();
 
         return new TopicResponseDTO.TopicPreviewResDTO(
@@ -102,9 +102,9 @@ public class TopicQueryServiceImpl implements TopicQueryService {
 
         if (topicIds.isEmpty()) return java.util.Collections.emptyMap();
 
-        List<OldestPerTopicProjection> oldestList = newsRepository.findOldestPerTopic(topicIds);
+        List<OldestPerTopicProjection> sourceList = newsRepository.findOldestPerTopic(topicIds);
 
-        return oldestList.stream().collect(
+        return sourceList.stream().collect(
                 java.util.stream.Collectors.toMap(
                         OldestPerTopicProjection::getTopicId,
                         p -> TopicResponseDTO.ImageSource.builder()
