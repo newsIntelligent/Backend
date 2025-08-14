@@ -80,13 +80,14 @@ public class MemberSettingController {
 		description = "<p>데일리 리포트 시간은 최대 3개까지 추가 가능합니다."
 			+ "<p>아무것도 추가하지 않고 리포트 발신을 키면, default로 11:00이 기본 설정됩니다.")
 	@PostMapping("/daily-report/time")
-	public CustomResponse<Void> addReportTime(
+	public CustomResponse<Long> addReportTime(
 		@AuthenticationPrincipal PrincipalUserDetails principal,
 		@Valid @RequestBody MemberSettingRequest.ReportTimeRequest request
 	) {
 		LocalTime time = request.toLocalTime();
-		settingService.addReportTime(principal.getMemberId(), time);
-		return CustomResponse.onSuccess(SuccessCode.OK, null);
+		// 프론트 디버깅을 위해 id 반환 추가
+		Long id = settingService.addReportTimeAndReturnId(principal.getMemberId(), time);
+		return CustomResponse.onSuccess(SuccessCode.OK, id);
 	}
 
 	@Operation(summary = "데일리리포트 수신 시간 삭제", description = "timeId는 데일리리포트의 PK id를 의미합니다.")

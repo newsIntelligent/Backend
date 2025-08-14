@@ -45,7 +45,8 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		Member m = findMember(memberId);
 
 		if (enabled && m.getDailyReports().isEmpty()) {
-			addReportTime(memberId, LocalTime.of(11, 0));
+			//addReportTime(memberId, LocalTime.of(11, 0));
+			addReportTimeAndReturnId(memberId, LocalTime.of(11, 0));
 		}
 
 		m.setDailyReportAlert(enabled);
@@ -69,8 +70,27 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		);
 	}
 
+//	@Override
+//	public void addReportTime(Long memberId, LocalTime reportTime) {
+//		Member m = findMember(memberId);
+//
+//		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
+//		// 시간 추가 최대 3개
+//		if(existing.size() >= 3) {
+//			throw new CustomException(ErrorCode.VALIDATION_FAILED);
+//		}
+//		// 시간 중복 추가 방지 검증
+//		boolean dup = existing.stream()
+//			.anyMatch(dr -> dr.getReportTime().equals(reportTime));
+//		if (dup) {
+//			throw new CustomException(ErrorCode.VALIDATION_FAILED);
+//		}
+//		DailyReport report = DailyReport.of(m, reportTime);
+//		dailyReportRepository.save(report);
+//	}
+
 	@Override
-	public void addReportTime(Long memberId, LocalTime reportTime) {
+	public Long addReportTimeAndReturnId(Long memberId, LocalTime reportTime) {
 		Member m = findMember(memberId);
 
 		List<DailyReport> existing = dailyReportRepository.findAllByMemberId(memberId);
@@ -84,8 +104,10 @@ public class MemberSettingServiceImpl implements MemberSettingService {
 		if (dup) {
 			throw new CustomException(ErrorCode.ADD_TIME_OVERLAP);
 		}
+
 		DailyReport report = DailyReport.of(m, reportTime);
 		dailyReportRepository.save(report);
+		return report.getId();
 	}
 
 	@Override
