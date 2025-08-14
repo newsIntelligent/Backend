@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.member.dto;
 
+import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +16,8 @@ public class MemberTopicResponseDTO {
             String topicName,
             String aiSummary,
             LocalDateTime summaryTime,
-            String imageUrl
+            String imageUrl,
+            TopicResponseDTO.ImageSource imageSource
     ) {}
 
     @Builder
