@@ -32,6 +32,9 @@ public enum ErrorCode implements BaseErrorCode{
 
     // 데일리 리포트 관련 에러
     DAILY_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "REPORT400", "데일리 리포트를 찾을 수 없습니다."),
+    // 멤버 세팅 관련 에러
+    ADD_TIME_EXCEED_MAXIMUM(HttpStatus.BAD_REQUEST, "SETTING400", "데일리 리포트는 회대 3개까지 추가 가능합니다."),
+    ADD_TIME_OVERLAP(HttpStatus.BAD_REQUEST, "SETTING401", "데일리 리포트 수신 시간에 중복된 시간이 있습니다."),
 
     // 인증 에러
     OTP_WRONG      ( HttpStatus.BAD_REQUEST, "AUTH401", "인증번호가 일치하지 않습니다."),
