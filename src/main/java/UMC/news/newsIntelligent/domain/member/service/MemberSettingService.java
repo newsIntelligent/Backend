@@ -9,6 +9,7 @@ public interface MemberSettingService {
 	void setReadTopicNotification(Long memberId, Boolean enabled);
 	void setDailyReportSend(Long memberId, Boolean enabled);
 	MemberSettingResponse getAllSettings(Long memberId);
-	void addReportTime(Long memberId, LocalTime time);
+	//void addReportTime(Long memberId, LocalTime time);
+	Long addReportTimeAndReturnId(Long memberId, LocalTime time);
 	void removeReportTime(Long memberId, Long timeId);
 }
