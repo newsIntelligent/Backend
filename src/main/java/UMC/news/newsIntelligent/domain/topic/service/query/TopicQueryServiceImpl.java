@@ -78,16 +78,16 @@ public class TopicQueryServiceImpl implements TopicQueryService {
     }
 
     @Override
-    public TopicResponseDTO.TopicDetailsResDTO getTopicById(Long topicId) {
+    public TopicResponseDTO.TopicPreviewResDTO getTopicById(Long topicId) {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
-        return new TopicResponseDTO.TopicDetailsResDTO(
+        return new TopicResponseDTO.TopicPreviewResDTO(
                 topic.getId(),
                 topic.getTopicName(),
                 topic.getAiSummary(),
-                topic.getImageUrl(),
-                topic.getSummaryTime()
+                topic.getSummaryTime(),
+                topic.getImageUrl()
         );
     }
 
