@@ -7,6 +7,8 @@ import UMC.news.newsIntelligent.domain.news.entity.News;
 import UMC.news.newsIntelligent.domain.news.entity.PressLogo;
 import UMC.news.newsIntelligent.domain.news.repository.NewsRepository;
 import UMC.news.newsIntelligent.domain.news.repository.PressLogoRepository;
+import UMC.news.newsIntelligent.domain.news.repository.latestCorrection.LatestCorrectionItemRepository;
+import UMC.news.newsIntelligent.domain.news.repository.latestCorrection.LatestCorrectionRepository;
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import UMC.news.newsIntelligent.domain.topic.repository.TopicRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
 import java.util.*;
@@ -31,6 +34,8 @@ public class NewsQueryServiceImpl implements NewsQueryService{
     private final TopicRepository topicRepository;
     private final NewsRepository newsRepository;
     private final PressLogoRepository pressLogoRepository;
+    private final LatestCorrectionRepository latestCorrectionRepository;
+    private final LatestCorrectionItemRepository lcItemRepository;
 
     // 연관 기사 목록
     @Override
@@ -54,34 +59,66 @@ public class NewsQueryServiceImpl implements NewsQueryService{
         return new NewsResponseDTO.NewsResDTO(content, totalCount, newLastId, pageSize, hasNext);
     }
 
-    // 최신 수정 보도 (조건 만족 + 같은 topic_id로 1개 이상인 토픽 1개)
     @Override
-    public NewsResponseDTO.TopicQualifiedItemResDTO getLatestTopicNews() throws CustomException {
-        Long qualifiedTopic = newsRepository.pickTopTopicIdByQualifiedNews();
-        if (qualifiedTopic == null) {
-            throw new CustomException(ErrorCode.TOPIC_NOT_FOUND);
-        }
-
-        Topic topic = topicRepository.findById(qualifiedTopic)
-                .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
-
-        List<News> relatedNewsEntity = newsRepository.findTop3QualifiedNewsByTopicId(qualifiedTopic);
-        if (relatedNewsEntity.isEmpty()) {
+    @Transactional(readOnly = true)
+    public NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews() {
+        // 1) 최신수정보도 중 "토픽 기사 수 ≥ 3"인 것 3건
+        var top3Page = org.springframework.data.domain.PageRequest.of(0, 3);
+        var lcs = latestCorrectionRepository.findRecentWhoseTopicHasAtLeastNews(3, top3Page);
+        if (lcs.isEmpty()) {
             throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
         }
-        List<NewsResponseDTO.NewsRelatedArticleDto> relatedNews =
-                NewsConverter.toRelatedDtos(relatedNewsEntity);
 
-        // 출처 기사
-        var source = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(qualifiedTopic);
-        NewsResponseDTO.ImageSource imageSource = source
-                .map(n -> NewsResponseDTO.ImageSource.builder()
-                        .press(n.getPress())
-                        .title(n.getTitle())
-                        .build())
-                .orElse(null);
+        List<NewsResponseDTO.TopicQualifiedItemResDTO> items = new java.util.ArrayList<>();
 
-        return NewsConverter.toTopicQualifiedItem(topic, imageSource, relatedNews);
+        for (var lc : lcs) {
+            var topic   = lc.getTopic();
+            Long topicId = topic.getId();
+
+            // 2) 자격 뉴스(이번 run에서 잡힌 것들) 최신순으로 최대 3개
+            var three = org.springframework.data.domain.PageRequest.of(0, 3);
+            List<News> qualified = lcItemRepository
+                    .findQualifiedNewsByLatestCorrectionId(lc.getId(), three);
+
+            // 3) 부족하면 같은 토픽의 다른 최신 뉴스로 채우기 (자격뉴스 제외)
+            List<Long> excludeIds = qualified.stream().map(News::getId).toList();
+            if (qualified.size() < 3) {
+                int need = 3 - qualified.size();
+                List<News> fillers = newsRepository
+                        .findFillersByTopicExclude(
+                                topicId,
+                                excludeIds.isEmpty() ? null : excludeIds,
+                                org.springframework.data.domain.PageRequest.of(0, need)
+                        );
+                if (!fillers.isEmpty()) {
+                    qualified = new java.util.ArrayList<>(qualified);
+                    qualified.addAll(fillers);
+                }
+            }
+
+            // 4) 최대 3개만 사용하여 DTO 변환
+            List<News> top3 = (qualified.size() > 3) ? qualified.subList(0, 3) : qualified;
+            List<NewsResponseDTO.NewsRelatedArticleDto> related =
+                    NewsConverter.toRelatedDtos(top3);
+
+            // 5) 출처 기사 (가장 오래된 기사 + id DESC)
+            var sourceOpt = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId);
+            NewsResponseDTO.ImageSource imageSource = sourceOpt
+                    .map(n -> NewsResponseDTO.ImageSource.builder()
+                            .press(n.getPress())
+                            .title(n.getTitle())
+                            .build())
+                    .orElse(null);
+
+            // 6) 단건 아이템 DTO
+            var item = NewsConverter.toTopicQualifiedItem(topic, imageSource, related);
+            items.add(item);
+        }
+
+        // 7) 3건 묶어서 반환
+        return NewsResponseDTO.TopicQualifiedListResDTO.builder()
+                .items(items)
+                .build();
     }
 
     private static int normalizeSize(int size) {

@@ -54,6 +54,11 @@ public class NewsResponseDTO {
     ) {}
 
     @Builder
+    public record TopicQualifiedListResDTO(
+            List<TopicQualifiedItemResDTO> items
+    ) {}
+
+    @Builder
     public record ImageSource(
             String press,
             String title
