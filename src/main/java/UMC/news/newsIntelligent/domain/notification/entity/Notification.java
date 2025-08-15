@@ -1,6 +1,7 @@
 package UMC.news.newsIntelligent.domain.notification.entity;
 
 import UMC.news.newsIntelligent.domain.member.entity.Member;
+import UMC.news.newsIntelligent.domain.news.entity.latestCorrection.LatestCorrection;
 import UMC.news.newsIntelligent.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,9 +28,6 @@ public class Notification extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
-	private String content;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private NotificationType notificationType;
@@ -40,6 +38,10 @@ public class Notification extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "latest_correction_id", nullable = false)
+	private LatestCorrection latestCorrection;
 
 	public void setChecked(Boolean checked) {
 		isChecked = checked;

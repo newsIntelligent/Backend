@@ -26,13 +26,13 @@ public class NotificationController {
 		description = "<p>구독한 토픽, 읽은 토픽에 대한 홈화면 알림 목록을 조회하는 API입니다."
 			+ "<p>커서 페이징 처리하였습니다.")
 	@GetMapping
-	public CustomResponse<NotificationResponse.NotificationCursorDto> getNotifications(
+	public CustomResponse<NotificationResponse.NotificationCursorResDTO> getNotifications(
 		@AuthenticationPrincipal PrincipalUserDetails principal,
 		@RequestParam(required = false) String cursor,
 		@RequestParam(defaultValue = "10") int size
 	) {
 		Long memberId = principal.getMemberId();
-		NotificationResponse.NotificationCursorDto body =
+		NotificationResponse.NotificationCursorResDTO body =
 			notificationService.getNotifications(memberId, cursor, size);
 
 		return CustomResponse.onSuccess(SuccessCode.OK, body);
