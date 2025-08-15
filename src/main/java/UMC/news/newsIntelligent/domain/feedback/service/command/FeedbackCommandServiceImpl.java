@@ -15,20 +15,15 @@ import org.springframework.stereotype.Service;
 public class FeedbackCommandServiceImpl implements FeedbackCommandService {
 
     private final FeedbackRepository feedbackRepository;
-    private final MemberRepository memberRepository;
 
     @Override
-    public void submitFeedback(FeedbackRequestDTO.FeedbackRequest request, Long memberId) {
-        // 피드백 내용이 null이거나 빈칸인 경우 customException 발생
+    public void submitFeedback(FeedbackRequestDTO.FeedbackRequest request) {
+        // 피드백 내용이 null 이거나 빈칸인 경우 customException 발생
         if (request.content() == null || request.content().isBlank()) {
             throw new CustomException(ErrorCode.FEEDBACK_EMPTY_CONTENT);
         }
 
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
-
         Feedback feedback = Feedback.builder()
-                .member(member)
                 .content(request.content())
                 .build();
 
