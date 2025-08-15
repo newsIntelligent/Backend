@@ -1,10 +1,13 @@
 package UMC.news.newsIntelligent.domain.news.dto;
 
+import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import lombok.Builder;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
 public class NewsResponseDTO {
 
 
@@ -28,6 +31,7 @@ public class NewsResponseDTO {
             String pressLogoUrl
     ) {}
 
+    @Builder
     public record NewsRelatedArticleDto (
             Long id,
             String press,
@@ -38,12 +42,20 @@ public class NewsResponseDTO {
     ) {}
 
     // “조건을 만족하는 토픽 묶음 중 최신 1개” 반환용 DTO
+    @Builder
     public record TopicQualifiedItemResDTO(
             Long id,
             String topicName,
             String aiSummary,
             String imageUrl,
             LocalDateTime summaryTime,
+            ImageSource imageSource,
             List<NewsRelatedArticleDto> relatedArticles
+    ) {}
+
+    @Builder
+    public record ImageSource(
+            String press,
+            String title
     ) {}
 }

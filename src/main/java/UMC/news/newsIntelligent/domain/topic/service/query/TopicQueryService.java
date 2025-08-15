@@ -8,5 +8,5 @@ public interface TopicQueryService {
 
     TopicResponseDTO.TopicPreviewListResDTO getTopicList(Long cursor, int size);
 
-    TopicResponseDTO.TopicDetailsResDTO getTopicById(Long topicId);
+    TopicResponseDTO.TopicPreviewResDTO getTopicById(Long topicId);
 }

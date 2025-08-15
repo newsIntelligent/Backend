@@ -15,7 +15,8 @@ public class TopicResponseDTO {
             String topicName,
             String aiSummary,
             LocalDateTime summaryTime,
-            String imageUrl
+            String imageUrl,
+            ImageSource imageSource
     ) {}
 
     @Builder
@@ -26,11 +27,8 @@ public class TopicResponseDTO {
     ) {}
 
     @Builder
-    public record TopicDetailsResDTO(
-            Long id,
-            String topicName,
-            String aiSummary,
-            String imageUrl,
-            LocalDateTime summaryTime
+    public record ImageSource(
+            String press,
+            String title
     ) {}
 }

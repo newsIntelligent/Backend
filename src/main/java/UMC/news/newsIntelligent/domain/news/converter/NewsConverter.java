@@ -2,14 +2,16 @@ package UMC.news.newsIntelligent.domain.news.converter;
 
 import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
 import UMC.news.newsIntelligent.domain.news.entity.News;
+import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public final class NewsConverter {
     private NewsConverter() {}
 
-    /** 단건 변환 */
     public static NewsResponseDTO.NewsListResDTO toListResDTO(News n, String pressLogoUrl) {
         return new NewsResponseDTO.NewsListResDTO(
                 n.getId(),
@@ -22,14 +24,13 @@ public final class NewsConverter {
         );
     }
 
-    /** 배치 변환 (press -> logoUrl 맵을 주입 받아 사용) */
+    // 리스트 매핑
     public static List<NewsResponseDTO.NewsListResDTO> toListResDTOs(
-            List<News> newsList,
-            Map<String, String> pressLogoMap,
-            String defaultLogoUrl
+            List<News> items,
+            Function<String, String> logoResolver
     ) {
-        return newsList.stream()
-                .map(n -> toListResDTO(n, pressLogoMap.getOrDefault(n.getPress(), defaultLogoUrl)))
+        return items.stream()
+                .map(n -> toListResDTO(n, logoResolver.apply(n.getPress())))
                 .toList();
     }
 
@@ -47,5 +48,21 @@ public final class NewsConverter {
 
     public static List<NewsResponseDTO.NewsRelatedArticleDto> toRelatedDtos(List<News> news) {
         return news.stream().map(NewsConverter::toRelatedDto).toList();
+    }
+
+    public static NewsResponseDTO.TopicQualifiedItemResDTO toTopicQualifiedItem(
+            Topic topic,
+            NewsResponseDTO.ImageSource imageSource,
+            List<NewsResponseDTO.NewsRelatedArticleDto> related
+    ) {
+        return NewsResponseDTO.TopicQualifiedItemResDTO.builder()
+                .id(topic.getId())
+                .topicName(topic.getTopicName())
+                .aiSummary(topic.getAiSummary())
+                .imageUrl(topic.getImageUrl())
+                .summaryTime(topic.getSummaryTime())
+                .imageSource(imageSource)
+                .relatedArticles(related)
+                .build();
     }
 }

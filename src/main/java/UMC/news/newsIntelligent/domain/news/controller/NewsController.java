@@ -27,8 +27,8 @@ public class NewsController {
             @ApiResponse(responseCode = "200", description = "토픽 상세 페이지 조회 성공")
     })
     @GetMapping("/{topicId}")
-    public CustomResponse<TopicResponseDTO.TopicDetailsResDTO> getTopicDetails(@PathVariable Long topicId){
-        TopicResponseDTO.TopicDetailsResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId);
+    public CustomResponse<TopicResponseDTO.TopicPreviewResDTO> getTopicDetails(@PathVariable Long topicId){
+        TopicResponseDTO.TopicPreviewResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId);
         return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, topicDetailsDTO);
     }
 
