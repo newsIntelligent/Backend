@@ -24,7 +24,8 @@
 <br />
 
 ## 📋 ERD
-<img width="1670" height="1122" alt="news_erd (3)" src="https://github.com/user-attachments/assets/96a6fac6-d411-413b-acc2-d2ad56269814" />
+<img width="1670" height="1082" alt="news_erd (4)" src="https://github.com/user-attachments/assets/c169548e-d9e6-49f2-b5b5-090a58769877" />
+
 
 
 
