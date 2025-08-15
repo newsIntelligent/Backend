@@ -51,8 +51,8 @@ public class NewsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토픽 출처 기사 목록 조회 성공")
     })
     @GetMapping("/latest")
-    public CustomResponse<NewsResponseDTO.TopicQualifiedItemResDTO> getLatestTopic() {
-        NewsResponseDTO.TopicQualifiedItemResDTO latestTopicNews = newsQueryServiceImpl.getLatestTopicNews();
+    public CustomResponse<NewsResponseDTO.TopicQualifiedListResDTO> getLatestTopic() {
+        NewsResponseDTO.TopicQualifiedListResDTO latestTopicNews = newsQueryServiceImpl.getLatestTopicNews();
         return CustomResponse.onSuccess(SuccessCode.GET_LATEST_TOPIC, latestTopicNews);
     }
 

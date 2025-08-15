@@ -7,5 +7,5 @@ public interface NewsQueryService {
 
     NewsResponseDTO.NewsResDTO getRelatedNews(Long topicId, Long lastId, int size);
 
-    NewsResponseDTO.TopicQualifiedItemResDTO getLatestTopicNews() throws CustomException;
+    NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews();
 }

@@ -86,6 +86,20 @@ WHERE n.topic.id IN :topicIds
     """)
     List<News> findAllQualifiedNotRecorded();
 
+    // 같은 토픽에서 자격 뉴스들을 제외하고 최신순으로 기사 수집
+    @Query("""
+        SELECT n
+        FROM News n
+        WHERE n.topic.id = :topicId
+          AND (:excludeIds IS NULL OR n.id NOT IN :excludeIds)
+        ORDER BY n.publishDate DESC, n.id DESC
+    """)
+    List<News> findFillersByTopicExclude(
+            @Param("topicId") Long topicId,
+            @Param("excludeIds") java.util.Collection<Long> excludeIds,
+            org.springframework.data.domain.Pageable pageable
+    );
+
     // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 큰 기사
     Optional<News> findFirstByTopicIdOrderByPublishDateAscIdDesc(Long topicId);
 }
