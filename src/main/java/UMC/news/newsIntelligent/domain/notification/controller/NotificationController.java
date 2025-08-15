@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.notification.controller;
 
+import UMC.news.newsIntelligent.domain.news.entity.latestCorrection.LatestCorrection;
 import UMC.news.newsIntelligent.domain.news.service.LatestCorrectionService;
 import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -14,6 +15,8 @@ import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notification")
@@ -72,7 +75,8 @@ public class NotificationController {
 	)
 	public CustomResponse<Void> ping() {
 		String runKey = java.util.UUID.randomUUID().toString();
-		latestCorrectionService.record(runKey);
+		List<LatestCorrection> latestCorrections = latestCorrectionService.record(runKey);
+		notificationService.createForRun(runKey, latestCorrections);
 		return CustomResponse.onSuccess(SuccessCode.OK, null);
 	}
 

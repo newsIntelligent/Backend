@@ -1,8 +1,12 @@
 package UMC.news.newsIntelligent.domain.notification.service;
 
+import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
+import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
+import UMC.news.newsIntelligent.domain.news.entity.latestCorrection.LatestCorrection;
 import UMC.news.newsIntelligent.domain.notification.converter.NotificationConverter;
 import UMC.news.newsIntelligent.domain.notification.dto.NotificationResponse;
 import UMC.news.newsIntelligent.domain.notification.entity.Notification;
+import UMC.news.newsIntelligent.domain.notification.entity.NotificationType;
 import UMC.news.newsIntelligent.domain.notification.repository.NotificationRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
@@ -22,6 +26,8 @@ import java.util.List;
 @Transactional
 public class NotificationServiceImpl implements NotificationService {
 
+	private final MemberTopicRepository memberTopicRepository;
+	private final MemberRepository memberRepository;
 	private final NotificationRepository notificationRepository;
 
 	@Override
@@ -74,5 +80,48 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public void markAllAsRead(Long memberId) {
 		notificationRepository.markAllAsChecked(memberId);
+	}
+
+
+	@Transactional
+	public int createForRun(String runKey, List<LatestCorrection> latestCorrections) {
+		if (latestCorrections == null || latestCorrections.isEmpty()) return 0;
+
+		int created = 0;
+
+		for (LatestCorrection lc : latestCorrections) {
+			Long topicId = lc.getTopic().getId();
+			Long lcId    = lc.getId();
+
+			// 구독 토픽 알림
+			List<Long> subscriberIds = memberTopicRepository.findSubscribedMemberIdsByTopicId(topicId);
+			if (!subscriberIds.isEmpty()) {
+				created += createForMembers(subscriberIds, lc, NotificationType.SUBSCRIBED);
+			}
+
+			// 읽은 토픽 알림
+			List<Long> readerIds = memberTopicRepository.findReadMemberIdsByTopicId(topicId);
+			if (!readerIds.isEmpty()) {
+				created += createForMembers(readerIds, lc, NotificationType.READ_TOPIC);
+			}
+		}
+		return created;
+	}
+
+	private int createForMembers(List<Long> memberIds, LatestCorrection lc, NotificationType type) {
+		int created = 0;
+		for (Long memberId : memberIds) {
+			boolean exists = notificationRepository
+					.existsByMember_IdAndLatestCorrection_IdAndNotificationType(
+							memberId, lc.getId(), type);
+
+			if (exists) continue;
+
+			var member = memberRepository.getReferenceById(memberId);
+			Notification n = Notification.of(member, lc, type);
+			notificationRepository.save(n);
+			created++;
+		}
+		return created;
 	}
 }

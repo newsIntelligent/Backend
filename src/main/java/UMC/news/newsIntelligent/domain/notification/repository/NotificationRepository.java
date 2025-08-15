@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import UMC.news.newsIntelligent.domain.notification.entity.NotificationType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -61,4 +62,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         WHERE n.member.id = :memberId AND n.isChecked = false
     """)
 	void markAllAsChecked(@Param("memberId") Long memberId);
+
+	// 특정 멤버가 특정 업데이트 사항을 특정 알림유형으로 받은 적이 있는지
+	boolean existsByMember_IdAndLatestCorrection_IdAndNotificationType(
+			Long memberId, Long latestCorrectionId, NotificationType type
+	);
 }

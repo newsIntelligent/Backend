@@ -46,4 +46,13 @@ public class Notification extends BaseEntity {
 	public void setChecked(Boolean checked) {
 		isChecked = checked;
 	}
+
+	public static Notification of(Member member, LatestCorrection lc, NotificationType type) {
+		Notification n = new Notification();
+		n.member = member;
+		n.latestCorrection = lc;
+		n.notificationType = type;
+		n.isChecked = false;
+		return n;
+	}
 }
