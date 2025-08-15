@@ -63,7 +63,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
     @Transactional(readOnly = true)
     public NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews() {
         // 1) 최신수정보도 중 "토픽 기사 수 ≥ 3"인 것 3건
-        var top3Page = org.springframework.data.domain.PageRequest.of(0, 3);
+        var top3Page = org.springframework.data.domain.PageRequest.of(0, 4);
         var lcs = latestCorrectionRepository.findRecentWhoseTopicHasAtLeastNews(3, top3Page);
         if (lcs.isEmpty()) {
             throw new CustomException(ErrorCode.LATEST_NEWS_NOT_FOUND);
