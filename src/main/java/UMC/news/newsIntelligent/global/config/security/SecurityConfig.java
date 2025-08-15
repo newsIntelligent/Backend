@@ -79,8 +79,7 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://newsintelligent.site",
                 "https://www.newsintelligent.site",
-                "https://api.newsintelligent.site",
-                "https://*.vercel.app"
+                "https://api.newsintelligent.site"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
