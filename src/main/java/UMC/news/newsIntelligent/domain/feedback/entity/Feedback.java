@@ -27,9 +27,10 @@ public class Feedback extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "member_id", nullable = false)
-	private Member member;
+	// 모든 사용자가 피드백을 제공할 수 있도록 주석처리
+//	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+//	@JoinColumn(name = "member_id", nullable = false)
+//	private Member member;
 
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String content;
