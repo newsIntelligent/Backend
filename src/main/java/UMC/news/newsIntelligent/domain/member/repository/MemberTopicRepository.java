@@ -1,5 +1,7 @@
 package UMC.news.newsIntelligent.domain.member.repository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
@@ -59,4 +61,20 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
          order by t.summaryTime desc
     """)
     Page<Topic> findSubscribedTopicsOrderByUpdatedDesc(@Param("memberId") Long memberId, Pageable pageable);
+
+    // 해당 토픽을 구독한 멤버 조회
+    @Query("""
+        SELECT mt.member.id
+        FROM MemberTopic mt
+        WHERE mt.topic.id = :topicId AND mt.isSubscribe = true
+    """)
+    List<Long> findSubscribedMemberIdsByTopicId(Long topicId);
+
+    // 해당 토픽을 읽은 멤버 조회
+    @Query("""
+        SELECT mt.member.id
+        FROM MemberTopic mt
+        WHERE mt.topic.id IN :topicId AND mt.isRead = true
+    """)
+    List<Long> findReadMemberIdsByTopicId(Long topicId);
 }
