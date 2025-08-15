@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import UMC.news.newsIntelligent.domain.dailyReport.entity.DailyReport;
 import UMC.news.newsIntelligent.domain.dailyReport.repository.DailyReportRepository;
@@ -21,6 +22,7 @@ public class DailyReportScheduler {
 	private final DailyReportRepository dailyReportRepository;
 	private final DailyReportSender sender;
 
+	@Transactional(readOnly = true)
 	@Scheduled(cron = "0 * * * * *")
 	public void tick() {
 		LocalTime now = LocalTime.now(ZoneId.of("Asia/Seoul"))
