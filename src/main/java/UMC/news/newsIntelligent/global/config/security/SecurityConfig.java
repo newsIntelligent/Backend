@@ -23,6 +23,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EnableWebSecurity
@@ -51,6 +52,10 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/api/members/signup/**",
                                         "/api/members/login/**",
+                                        "/api/topic/**",
+                                        "/api/topics/search/**",
+                                        "/api/topics/home/**",
+                                        "/api/feedbacks/**",
                                         "/api/notification/ping"
                                 ).permitAll()
                                 .requestMatchers(
@@ -70,11 +75,12 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "https://newsintelligent.site",
                 "https://www.newsintelligent.site",
-                "https://api.newsintelligent.site"
+                "https://api.newsintelligent.site",
+                "https://*.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
