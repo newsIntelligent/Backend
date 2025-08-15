@@ -73,6 +73,19 @@ WHERE n.topic.id IN :topicIds
 """)
     List<OldestPerTopicProjection> findOldestPerTopic(java.util.Collection<Long> topicIds);
 
+    // is_new = true AND is_third = false 인 기사 중
+    // 아직 어떤 run에서도 LatestCorrectionItem 에 기록되지 않은 것만
+    @Query("""
+        SELECT n
+        FROM News n
+        WHERE n.isNew = true AND n.isThird = false
+          AND NOT EXISTS (
+              SELECT 1 FROM LatestCorrectionItem i
+              WHERE i.news.id = n.id
+          )
+    """)
+    List<News> findAllQualifiedNotRecorded();
+
     // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 큰 기사
     Optional<News> findFirstByTopicIdOrderByPublishDateAscIdDesc(Long topicId);
 }
