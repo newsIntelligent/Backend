@@ -74,7 +74,7 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     @Query("""
         SELECT mt.member.id
         FROM MemberTopic mt
-        WHERE mt.topic.id IN :topicIds AND mt.isRead = true
+        WHERE mt.topic.id IN :topicId AND mt.isRead = true
     """)
     List<Long> findReadMemberIdsByTopicId(Long topicId);
 }
