@@ -3,7 +3,6 @@ package UMC.news.newsIntelligent.domain.member.controller;
 import java.time.LocalTime;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import UMC.news.newsIntelligent.domain.dailyReport.repository.DailyReportRepository;
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingRequest;
 import UMC.news.newsIntelligent.domain.member.dto.MemberSettingResponse;
 import UMC.news.newsIntelligent.domain.member.service.MemberSettingServiceImpl;
@@ -32,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 public class MemberSettingController {
 
 	private final MemberSettingServiceImpl settingService;
-	private final DailyReportRepository dailyReportRepository;
 
 	@Operation(summary = "구독 토픽 변경사항 알림 설정(on/off)",
 		description = "<p>구독한 토픽의 업데이트 알림을 토글 형식으로 설정합니다.")
