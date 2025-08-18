@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -33,6 +34,9 @@ public class AuthController {
 
     private final AuthService authService;
     private final MemberRepository memberRepository;
+
+    @Value("${server.host.front}")
+    private String frontHost;
 
     /* 메일 발송 */
     @Operation(summary = "회원가입 인증번호 전송", description = "회원가입 시 사용자에게 이메일로 인증번호를 전송하는 API입니다.")
@@ -84,20 +88,30 @@ public class AuthController {
         return CustomResponse.onSuccess(SuccessCode.WITHDRAW_SUCCESS);
     }
 
+    /* 리다이렉트 처리용 */
+    private RedirectView redirectWithFragment(String path, TokenResponseDto tr) {
+        String token = URLEncoder.encode(tr.accessToken(), StandardCharsets.UTF_8);
+        String exp   = URLEncoder.encode(tr.expiresAt(),   StandardCharsets.UTF_8);
+
+        String url = frontHost + path + "#token=" + token + "&exp=" + exp;
+
+        RedirectView rv = new RedirectView(url);
+        rv.setExposeModelAttributes(false);
+        rv.setContextRelative(false);
+        return rv;
+    }
 
     /* 매직 링크 */
     @Operation(summary = "리다이렉트용", description = "프론트엔드에서 구현 필요 X")
     @GetMapping("/signup/magic")
     public RedirectView signupMagic(@RequestParam String token) {
         TokenResponseDto tr = authService.signupByToken(token);
-        String at = URLEncoder.encode(tr.accessToken(), StandardCharsets.UTF_8);
-        return new RedirectView("/signup/magic-success#" + at);
+        return redirectWithFragment("/signup/magic-success", tr);
     }
     @Operation(summary = "리다이렉트용", description = "프론트엔드에서 구현 필요 X")
     @GetMapping("/login/magic")
     public RedirectView loginMagic(@RequestParam String token) {
         TokenResponseDto tr = authService.loginByToken(token);
-        String at = URLEncoder.encode(tr.accessToken(), StandardCharsets.UTF_8);
-        return new RedirectView("/login/magic-success#" + at);
+        return redirectWithFragment("/login/magic-success", tr);
     }
 }
