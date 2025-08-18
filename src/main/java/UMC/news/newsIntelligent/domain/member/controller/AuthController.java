@@ -3,7 +3,6 @@ package UMC.news.newsIntelligent.domain.member.controller;
 import UMC.news.newsIntelligent.domain.mail.dto.EmailRequestDto;
 import UMC.news.newsIntelligent.domain.mail.dto.VerifyRequestDto;
 import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
-import UMC.news.newsIntelligent.domain.member.dto.MemberResponseDto;
 import UMC.news.newsIntelligent.domain.member.dto.TokenResponseDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
@@ -50,8 +49,8 @@ public class AuthController {
     /* 인증 코드 검증 */
     @Operation(summary = "회원가입 인증코드 검증", description = "회원가입 시 전송된 6자리 코드를 검증하는 API입니다.")
     @PostMapping("/signup/verify")
-    public CustomResponse<MemberResponseDto>  signupVerify(@RequestBody VerifyRequestDto request) {
-        MemberResponseDto responseDto = authService.signupByCode(request.email(), request.code());
+    public CustomResponse<TokenResponseDto>  signupVerify(@RequestBody VerifyRequestDto request) {
+        TokenResponseDto responseDto = authService.signupByCode(request.email(), request.code());
         return CustomResponse.onSuccess(SuccessCode.SIGNUP_SUCCESS, responseDto);
     }
     @Operation(summary = "로그인 인증코드 검증", description = "로그인 시 전송된 6자리 코드를 검증하는  API입니다.")
@@ -87,8 +86,8 @@ public class AuthController {
     @Operation(summary = "리다이렉트용", description = "프론트엔드에서 구현 필요 X")
     @GetMapping("/signup/magic")
     public RedirectView signupMagic(@RequestParam String token) {
-        authService.signupByToken(token);
-        return new RedirectView("/signup/success");
+        TokenResponseDto tr = authService.signupByToken(token);
+        return new RedirectView("/signup/success" + tr.accessToken());
     }
     @Operation(summary = "리다이렉트용", description = "프론트엔드에서 구현 필요 X")
     @GetMapping("/login/magic")

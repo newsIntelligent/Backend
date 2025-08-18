@@ -71,7 +71,7 @@ public class AuthService {
     }
 
     /* 회원가입 코드 검증 */
-    public MemberResponseDto signupByCode(String email, String code) {
+    public TokenResponseDto signupByCode(String email, String code) {
         OtpCode otp = otpCodeRepository.findByEmailAndType(email, OtpCode.Type.SIGNUP)
                 .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
@@ -98,7 +98,20 @@ public class AuthService {
         otp.markVerified();
         otpCodeRepository.delete(otp);
 
-        return MemberResponseDto.from(member);
+        String token = jwtTokenProvider.generateAccessToken(member.getId(), member.getEmail(), "ROLE_USER");
+        Date exp = jwtTokenProvider.getExpiration(token);
+        ZoneId KST = ZoneId.of("Asia/Seoul");
+        String expIsoKst = exp.toInstant()
+                .atZone(KST)
+                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+        member.updateLastLogin();
+        memberRepository.save(member);
+
+        return TokenResponseDto.builder()
+                .accessToken(token)
+                .expiresAt(expIsoKst)
+                .build();
     }
 
     /* 로그인 코드 검증 */
@@ -133,7 +146,7 @@ public class AuthService {
     }
 
     /* 회원가입 매직링크 검증 */
-    public MemberResponseDto signupByToken(String token) {
+    public TokenResponseDto signupByToken(String token) {
         OtpCode otp = otpCodeRepository.findByTokenAndType(token, SIGNUP)
                 .orElseThrow(() ->  new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
