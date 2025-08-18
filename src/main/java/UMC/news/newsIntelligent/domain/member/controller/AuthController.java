@@ -21,6 +21,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 
 @RestController
 @RequestMapping("/api/members")
@@ -87,12 +90,14 @@ public class AuthController {
     @GetMapping("/signup/magic")
     public RedirectView signupMagic(@RequestParam String token) {
         TokenResponseDto tr = authService.signupByToken(token);
-        return new RedirectView("/signup/success" + tr.accessToken());
+        String at = URLEncoder.encode(tr.accessToken(), StandardCharsets.UTF_8);
+        return new RedirectView("/signup/magic-success#" + at);
     }
     @Operation(summary = "리다이렉트용", description = "프론트엔드에서 구현 필요 X")
     @GetMapping("/login/magic")
     public RedirectView loginMagic(@RequestParam String token) {
         TokenResponseDto tr = authService.loginByToken(token);
-        return new RedirectView("/login/magic-success#" + tr.accessToken());
+        String at = URLEncoder.encode(tr.accessToken(), StandardCharsets.UTF_8);
+        return new RedirectView("/login/magic-success#" + at);
     }
 }
