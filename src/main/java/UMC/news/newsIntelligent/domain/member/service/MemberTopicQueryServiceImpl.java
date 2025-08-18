@@ -34,7 +34,8 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
         Slice<Topic> topicSlice = memberTopicRepository.searchReadTopicsByKeyword(memberId, keyword, cursor, pageable);
 
         Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        return toPreviewList(topicSlice, srcMap);
+        Map<Long, Boolean> subMap = buildSubscribedMap(memberId, topicSlice);
+        return toPreviewList(topicSlice, srcMap, subMap);
     }
 
     @Override
@@ -46,7 +47,8 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
         Slice<Topic> topicSlice = memberTopicRepository.getReadTopicsByMemberId(memberId, cursor, pageable);
 
         Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        return toPreviewList(topicSlice, srcMap);
+        Map<Long, Boolean> subMap = buildSubscribedMap(memberId, topicSlice);
+        return toPreviewList(topicSlice, srcMap, subMap);
     }
 
     @Override
@@ -58,7 +60,8 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
         Slice<Topic> topicSlice = memberTopicRepository.getSubscriptionTopicsByMemberId(memberId, cursor, pageable);
 
         Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        return toPreviewList(topicSlice, srcMap);
+        Map<Long, Boolean> subMap = buildSubscribedMap(memberId, topicSlice);
+        return toPreviewList(topicSlice, srcMap, subMap);
     }
 
     // 해당 페이지 기사들 한 번에 조회 -> Map
@@ -85,9 +88,10 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
 
     private MemberTopicResponseDTO.MemberTopicPreviewListResDTO toPreviewList(
             Slice<Topic> slice,
-            Map<Long, TopicResponseDTO.ImageSource> srcMap
+            Map<Long, TopicResponseDTO.ImageSource> srcMap,
+            Map<Long, Boolean> subMap
     ) {
-        var topics = MemberTopicConverter.toPreviewResDTOList(slice.getContent(), srcMap);
+        var topics = MemberTopicConverter.toPreviewResDTOList(slice.getContent(), srcMap, subMap);
 
         Long nextCursor = (slice.hasNext() && !topics.isEmpty())
                 ? topics.get(topics.size() - 1).id()
@@ -98,6 +102,24 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
                 .hasNext(slice.hasNext())
                 .topics(topics)
                 .build();
+    }
+
+    // 로그인 유저 구독여부 매핑
+    public Map<Long, Boolean> buildSubscribedMap(Long memberId, Slice<Topic> slice) {
+        List<Long> topicIds = slice.getContent().stream().map(Topic::getId).toList();
+        if (topicIds.isEmpty()) return java.util.Collections.emptyMap();
+
+        if (memberId == null) {
+            // 비로그인의 경우 전부 false
+            return java.util.Collections.emptyMap();
+        }
+
+        List<Long> subscribed = memberTopicRepository
+                .findSubscribedTopicIdsByMemberAndTopicIds(memberId, topicIds);
+
+        Map<Long, Boolean> map = new java.util.HashMap<>();
+        for (Long id : subscribed) map.put(id, true);
+        return map;
     }
 
     private Long normalizeCursor(Long cursor) {

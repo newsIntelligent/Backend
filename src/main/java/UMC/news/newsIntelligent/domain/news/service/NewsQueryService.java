@@ -7,5 +7,5 @@ public interface NewsQueryService {
 
     NewsResponseDTO.NewsResDTO getRelatedNews(Long topicId, Long lastId, int size);
 
-    NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews();
+    NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews(Long memberId);
 }

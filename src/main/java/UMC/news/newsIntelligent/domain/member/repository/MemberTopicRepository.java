@@ -77,4 +77,16 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
         WHERE mt.topic.id IN :topicId AND mt.isRead = true
     """)
     List<Long> findReadMemberIdsByTopicId(Long topicId);
+
+    @Query("""
+    select mt.topic.id
+      from MemberTopic mt
+     where mt.member.id = :memberId
+       and mt.isSubscribe = true
+       and mt.topic.id in :topicIds
+""")
+    List<Long> findSubscribedTopicIdsByMemberAndTopicIds(@Param("memberId") Long memberId,
+                                                         @Param("topicIds") List<Long> topicIds);
+
+    boolean existsByMemberIdAndTopicIdAndIsSubscribeTrue(Long memberId, Long topicId);
 }

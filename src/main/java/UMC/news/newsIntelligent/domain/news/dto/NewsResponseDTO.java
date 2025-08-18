@@ -50,6 +50,7 @@ public class NewsResponseDTO {
             String imageUrl,
             LocalDateTime summaryTime,
             ImageSource imageSource,
+            boolean isSub,
             List<NewsRelatedArticleDto> relatedArticles
     ) {}
 

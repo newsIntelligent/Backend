@@ -53,6 +53,7 @@ public final class NewsConverter {
     public static NewsResponseDTO.TopicQualifiedItemResDTO toTopicQualifiedItem(
             Topic topic,
             NewsResponseDTO.ImageSource imageSource,
+            boolean isSub,
             List<NewsResponseDTO.NewsRelatedArticleDto> related
     ) {
         return NewsResponseDTO.TopicQualifiedItemResDTO.builder()
@@ -62,6 +63,7 @@ public final class NewsConverter {
                 .imageUrl(topic.getImageUrl())
                 .summaryTime(topic.getSummaryTime())
                 .imageSource(imageSource)
+                .isSub(isSub)
                 .relatedArticles(related)
                 .build();
     }

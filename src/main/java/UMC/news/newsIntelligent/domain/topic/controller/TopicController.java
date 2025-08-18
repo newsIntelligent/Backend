@@ -43,9 +43,11 @@ public class TopicController {
     public CustomResponse<TopicResponseDTO.TopicPreviewListResDTO> searchTopics(
             @RequestParam String keyword,
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") @Max(10) int size
+            @RequestParam(defaultValue = "10") @Max(10) int size,
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
-        TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.searchTopics(keyword, cursor, size);
+        Long memberId = (principal == null) ? null : principal.getMemberId();
+        TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.searchTopics(keyword, cursor, size, memberId);
 
         return CustomResponse.onSuccess(topicResDTO);
     }
@@ -59,9 +61,11 @@ public class TopicController {
     @GetMapping("/home")
     public CustomResponse<TopicResponseDTO.TopicPreviewListResDTO> getTopics(
             @RequestParam(required = false) Long cursor,
-            @RequestParam(defaultValue = "10") @Max(10) int size
+            @RequestParam(defaultValue = "10") @Max(10) int size,
+            @AuthenticationPrincipal PrincipalUserDetails principal
     ) {
-        TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.getTopicList(cursor, size);
+        Long memberId = (principal == null) ? null : principal.getMemberId();
+        TopicResponseDTO.TopicPreviewListResDTO topicResDTO = topicQueryService.getTopicList(cursor, size, memberId);
 
         return CustomResponse.onSuccess(topicResDTO);
     }

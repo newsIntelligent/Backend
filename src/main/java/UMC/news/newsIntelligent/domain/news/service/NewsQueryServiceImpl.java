@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.news.service;
 
+import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
 import UMC.news.newsIntelligent.domain.news.converter.NewsConverter;
 import UMC.news.newsIntelligent.domain.news.dto.NewsResponseDTO;
 //import UMC.news.newsIntelligent.domain.news.entity.News;
@@ -36,6 +37,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
     private final PressLogoRepository pressLogoRepository;
     private final LatestCorrectionRepository latestCorrectionRepository;
     private final LatestCorrectionItemRepository lcItemRepository;
+    private final MemberTopicRepository memberTopicRepository;
 
     // 연관 기사 목록
     @Override
@@ -61,8 +63,8 @@ public class NewsQueryServiceImpl implements NewsQueryService{
 
     @Override
     @Transactional(readOnly = true)
-    public NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews() {
-        // 1) 최신수정보도 중 "토픽 기사 수 ≥ 3"인 것 3건
+    public NewsResponseDTO.TopicQualifiedListResDTO getLatestTopicNews(Long memberId) {
+        // 최신수정보도 중 "토픽 기사 수 ≥ 3"인 것 4건
         var top3Page = org.springframework.data.domain.PageRequest.of(0, 4);
         var lcs = latestCorrectionRepository.findRecentWhoseTopicHasAtLeastNews(3, top3Page);
         if (lcs.isEmpty()) {
@@ -75,12 +77,12 @@ public class NewsQueryServiceImpl implements NewsQueryService{
             var topic   = lc.getTopic();
             Long topicId = topic.getId();
 
-            // 2) 자격 뉴스(이번 run에서 잡힌 것들) 최신순으로 최대 3개
+            // 자격 뉴스(이번 run에서 잡힌 것들) 최신순으로 최대 3개
             var three = org.springframework.data.domain.PageRequest.of(0, 3);
             List<News> qualified = lcItemRepository
                     .findQualifiedNewsByLatestCorrectionId(lc.getId(), three);
 
-            // 3) 부족하면 같은 토픽의 다른 최신 뉴스로 채우기 (자격뉴스 제외)
+            // 부족하면 같은 토픽의 다른 최신 뉴스로 채우기 (자격뉴스 제외)
             List<Long> excludeIds = qualified.stream().map(News::getId).toList();
             if (qualified.size() < 3) {
                 int need = 3 - qualified.size();
@@ -96,12 +98,12 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                 }
             }
 
-            // 4) 최대 3개만 사용하여 DTO 변환
+            // 최대 3개만 사용하여 DTO 변환
             List<News> top3 = (qualified.size() > 3) ? qualified.subList(0, 3) : qualified;
             List<NewsResponseDTO.NewsRelatedArticleDto> related =
                     NewsConverter.toRelatedDtos(top3);
 
-            // 5) 출처 기사 (가장 오래된 기사 + id DESC)
+            // 출처 기사 (가장 오래된 기사 + id DESC)
             var sourceOpt = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId);
             NewsResponseDTO.ImageSource imageSource = sourceOpt
                     .map(n -> NewsResponseDTO.ImageSource.builder()
@@ -110,12 +112,18 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                             .build())
                     .orElse(null);
 
-            // 6) 단건 아이템 DTO
-            var item = NewsConverter.toTopicQualifiedItem(topic, imageSource, related);
+            boolean isSub = false;
+            if (memberId != null) {
+                isSub = memberTopicRepository
+                        .existsByMemberIdAndTopicIdAndIsSubscribeTrue(memberId, topicId);
+            }
+
+            // 단건 아이템 DTO
+            var item = NewsConverter.toTopicQualifiedItem(topic, imageSource, isSub, related);
             items.add(item);
         }
 
-        // 7) 3건 묶어서 반환
+        // 3건 묶어서 반환
         return NewsResponseDTO.TopicQualifiedListResDTO.builder()
                 .items(items)
                 .build();

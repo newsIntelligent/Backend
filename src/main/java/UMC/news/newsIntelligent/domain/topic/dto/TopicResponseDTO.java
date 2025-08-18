@@ -16,7 +16,8 @@ public class TopicResponseDTO {
             String aiSummary,
             LocalDateTime summaryTime,
             String imageUrl,
-            ImageSource imageSource
+            ImageSource imageSource,
+            boolean isSub
     ) {}
 
     @Builder
