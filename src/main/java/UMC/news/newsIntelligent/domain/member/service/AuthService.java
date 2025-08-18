@@ -3,7 +3,6 @@ package UMC.news.newsIntelligent.domain.member.service;
 import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
 import UMC.news.newsIntelligent.domain.mail.repository.OtpCodeRepository;
 import UMC.news.newsIntelligent.domain.mail.service.MailService;
-import UMC.news.newsIntelligent.domain.member.dto.MemberResponseDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.entity.RevokedToken;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
@@ -19,8 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static UMC.news.newsIntelligent.domain.mail.entity.OtpCode.Type.LOGIN;
 import static UMC.news.newsIntelligent.domain.mail.entity.OtpCode.Type.SIGNUP;
