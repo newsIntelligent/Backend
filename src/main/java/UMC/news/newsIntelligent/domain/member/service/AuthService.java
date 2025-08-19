@@ -3,7 +3,6 @@ package UMC.news.newsIntelligent.domain.member.service;
 import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
 import UMC.news.newsIntelligent.domain.mail.repository.OtpCodeRepository;
 import UMC.news.newsIntelligent.domain.mail.service.MailService;
-import UMC.news.newsIntelligent.domain.member.dto.MemberResponseDto;
 import UMC.news.newsIntelligent.domain.member.entity.Member;
 import UMC.news.newsIntelligent.domain.member.entity.RevokedToken;
 import UMC.news.newsIntelligent.domain.member.repository.MemberRepository;
@@ -12,14 +11,13 @@ import UMC.news.newsIntelligent.domain.member.repository.RevokedTokenRepository;
 import UMC.news.newsIntelligent.global.apiPayload.code.error.ErrorCode;
 import UMC.news.newsIntelligent.global.apiPayload.exception.CustomException;
 import UMC.news.newsIntelligent.global.config.security.jwt.JwtTokenProvider;
+import UMC.news.newsIntelligent.global.utils.AuthUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static UMC.news.newsIntelligent.domain.mail.entity.OtpCode.Type.LOGIN;
 import static UMC.news.newsIntelligent.domain.mail.entity.OtpCode.Type.SIGNUP;
@@ -33,8 +31,8 @@ public class AuthService {
     private final OtpCodeRepository otpCodeRepository;
     private final MailService mailService;
     private final RevokedTokenRepository revokedTokenRepository;
-    private final NicknameService nicknameService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final AuthUtils authUtils;
 
     /* 메일 발송 (공통) */
     public void sendCode(String email, OtpCode.Type type) {
@@ -71,34 +69,18 @@ public class AuthService {
     }
 
     /* 회원가입 코드 검증 */
-    public MemberResponseDto signupByCode(String email, String code) {
-        OtpCode otp = otpCodeRepository.findByEmailAndType(email, OtpCode.Type.SIGNUP)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
-        otp.validateUsable();
+    public TokenResponseDto signupByCode(String email, String code) {
+        OtpCode otp = authUtils.getOtpCode(email, SIGNUP);
 
         if (!otp.getCode().equals(code))
             throw new CustomException(ErrorCode.OTP_WRONG);
 
-        Member member = memberRepository.findByEmail(email).orElse(null);
-        if (member == null) {
-            String nickname = nicknameService.proposeFromEmail(email);
-            member = memberRepository.save(
-                    Member.builder()
-                            .email(email)
-                            .notificationEmail(email)
-                            .nickname(nickname)
-                            .subscribeTopicAlert(true)
-                            .readTopicAlert(true)
-                            .dailyReportAlert(true)
-                            .isDeactivated(false)
-                            .build()
-            );
-        }
+        Member member = authUtils.saveAndReturnMember(email);
 
         otp.markVerified();
         otpCodeRepository.delete(otp);
 
-        return MemberResponseDto.from(member);
+        return authUtils.generateToken(member);
     }
 
     /* 로그인 코드 검증 */
@@ -109,35 +91,28 @@ public class AuthService {
         if (member.isDeactivated())
             throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
 
-        OtpCode otpCode = otpCodeRepository.findByEmailAndType(email, LOGIN)
-                .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
-        otpCode.validateUsable();
+        OtpCode otpCode = authUtils.getOtpCode(email, LOGIN);
+
         if (!otpCode.getCode().equals(code))
             throw new CustomException(ErrorCode.OTP_WRONG);
 
-        String token = jwtTokenProvider.generateAccessToken(member.getId(), member.getEmail(), "ROLE_USER");
-
-        Date exp = jwtTokenProvider.getExpiration(token);
-        ZoneId KST = ZoneId.of("Asia/Seoul");
-        String expIsoKst = exp.toInstant()
-                .atZone(KST)
-                .format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
-        member.updateLastLogin();
         otpCodeRepository.delete(otpCode);
 
-        return TokenResponseDto.builder()
-                .accessToken(token)
-                .expiresAt(expIsoKst)
-                .build();
+        return authUtils.generateToken(member);
     }
 
     /* 회원가입 매직링크 검증 */
-    public MemberResponseDto signupByToken(String token) {
+    public TokenResponseDto signupByToken(String token) {
         OtpCode otp = otpCodeRepository.findByTokenAndType(token, SIGNUP)
                 .orElseThrow(() ->  new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
-        return signupByCode(otp.getEmail(), otp.getCode());
+
+        Member member = authUtils.saveAndReturnMember(otp.getEmail());
+
+        otp.markVerified();
+        otpCodeRepository.delete(otp);
+
+        return authUtils.generateToken(member);
     }
 
     /* 로그인 매직링크 검증 */
@@ -145,7 +120,13 @@ public class AuthService {
         OtpCode otp = otpCodeRepository.findByTokenAndType(token, LOGIN)
                 .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
-        return loginByCode(otp.getEmail(), otp.getCode());
+
+        Member member = memberRepository.findByEmail(otp.getEmail())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+        if (member.isDeactivated()) throw new CustomException(ErrorCode.MEMBER_ALREADY_DEACTIVATED);
+
+        otpCodeRepository.delete(otp);
+        return authUtils.generateToken(member);
     }
 
     /* 로그아웃 */
