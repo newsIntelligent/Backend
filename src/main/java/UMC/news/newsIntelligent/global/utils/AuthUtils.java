@@ -35,7 +35,7 @@ public class AuthUtils {
 
     /* OTP 조회 */
     public OtpCode getOtpCode(String email, OtpCode.Type type) {
-        OtpCode otp = otpCodeRepository.findByEmailAndType(email, OtpCode.Type.SIGNUP)
+        OtpCode otp = otpCodeRepository.findByEmailAndType(email, type)
                 .orElseThrow(() -> new CustomException(ErrorCode.BAD_REQUEST_400));
         otp.validateUsable();
 
