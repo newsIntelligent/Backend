@@ -33,21 +33,25 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     );
 
     @Query("""
-    SELECT mt.topic FROM MemberTopic mt
-    WHERE mt.member.id = :memberId
-      AND mt.isRead = true
-      AND (:cursor IS NULL OR mt.topic.id < :cursor)
-    ORDER BY mt.topic.id DESC
-""")
+    select t
+    from MemberTopic mt
+    join fetch mt.topic t
+    where mt.member.id = :memberId
+      and mt.isRead = true
+      and (:cursor is null or t.id < :cursor)
+    order by t.id desc
+    """)
     Slice<Topic> getReadTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
     @Query("""
-    SELECT mt.topic FROM MemberTopic mt
-    WHERE mt.member.id = :memberId
-      AND mt.isSubscribe = true
-      AND (:cursor IS NULL OR mt.topic.id < :cursor)
-    ORDER BY mt.topic.id DESC
-""")
+    select t
+    from MemberTopic mt
+    join fetch mt.topic t
+    where mt.member.id = :memberId
+      and mt.isSubscribe = true
+      and (:cursor is null or t.id < :cursor)
+    order by t.id desc
+    """)
     Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
     Optional<MemberTopic> findByMemberIdAndTopicId(Long memberId, Long topicId);

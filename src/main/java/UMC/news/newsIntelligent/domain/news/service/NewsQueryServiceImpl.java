@@ -32,7 +32,6 @@ public class NewsQueryServiceImpl implements NewsQueryService{
     private static final int MAX_PAGE_SIZE = 20;
     private static final String DEFAULT_LOGO = null; // 기본 로고
 
-    private final TopicRepository topicRepository;
     private final NewsRepository newsRepository;
     private final PressLogoRepository pressLogoRepository;
     private final LatestCorrectionRepository latestCorrectionRepository;
