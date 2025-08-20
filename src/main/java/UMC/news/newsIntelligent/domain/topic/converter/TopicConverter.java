@@ -36,7 +36,7 @@ public class TopicConverter {
                 .map(t -> toPreviewResDTO(
                         t,
                         imageSourceMap.get(t.getId()),
-                        subscribedMap.getOrDefault(t.getId(), false)
+                        (subscribedMap != null) && subscribedMap.getOrDefault(t.getId(), false)
                 ))
                 .toList();
     }

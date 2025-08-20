@@ -1,6 +1,8 @@
 package UMC.news.newsIntelligent.domain.member.service;
 
+import UMC.news.newsIntelligent.domain.member.converter.MemberTopicConverter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
+import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
 import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
 import UMC.news.newsIntelligent.domain.member.support.TopicQueryUtils;
 import UMC.news.newsIntelligent.domain.news.repository.NewsRepository;
@@ -35,14 +37,11 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
         size = normalizeSize(size);
 
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Topic> topicSlice =
-                memberTopicRepository.searchReadTopicsByKeyword(memberId, keyword, cursor, pageable);
+        Slice<MemberTopic> slice =
+                memberTopicRepository.searchReadWithTopic(memberId, keyword, cursor, pageable);
 
-        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        Map<Long, Boolean> subMap =
-                TopicQueryUtils.buildSubscribedMap(memberId, topicSlice, memberTopicRepository);
-
-        return toPreviewList(topicSlice, srcMap, subMap);
+        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromMtSlice(slice);
+        return MemberTopicConverter.toPreviewList(slice, srcMap);
     }
 
     @Override
@@ -50,17 +49,14 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
             Long cursor, int size, Long memberId
     ) {
         cursor = normalizeCursor(cursor);
-        size = normalizeSize(size);
+        size  = normalizeSize(size);
 
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Topic> topicSlice =
-                memberTopicRepository.getReadTopicsByMemberId(memberId, cursor, pageable);
+        Slice<MemberTopic> slice =
+                memberTopicRepository.getReadWithTopic(memberId, cursor, pageable);
 
-        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        Map<Long, Boolean> subMap =
-                TopicQueryUtils.buildSubscribedMap(memberId, topicSlice, memberTopicRepository);
-
-        return toPreviewList(topicSlice, srcMap, subMap);
+        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromMtSlice(slice);
+        return MemberTopicConverter.toPreviewList(slice, srcMap);
     }
 
     @Override
@@ -68,29 +64,23 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
             Long cursor, int size, Long memberId
     ) {
         cursor = normalizeCursor(cursor);
-        size = normalizeSize(size);
+        size  = normalizeSize(size);
 
         Pageable pageable = PageRequest.of(0, size);
-        Slice<Topic> topicSlice =
-                memberTopicRepository.getSubscriptionTopicsByMemberId(memberId, cursor, pageable);
+        Slice<MemberTopic> slice =
+                memberTopicRepository.findSubscribedWithTopic(memberId, cursor, pageable);
 
-        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromSlice(topicSlice);
-        Map<Long, Boolean> subMap =
-                TopicQueryUtils.buildSubscribedMap(memberId, topicSlice, memberTopicRepository);
-
-        return toPreviewList(topicSlice, srcMap, subMap);
+        Map<Long, TopicResponseDTO.ImageSource> srcMap = buildImageSourceMapFromMtSlice(slice);
+        return MemberTopicConverter.toPreviewList(slice, srcMap);
     }
 
-
-    private Map<Long, TopicResponseDTO.ImageSource> buildImageSourceMapFromSlice(Slice<Topic> slice) {
+    private Map<Long, TopicResponseDTO.ImageSource> buildImageSourceMapFromMtSlice(Slice<MemberTopic> slice) {
         List<Long> topicIds = slice.getContent().stream()
-                .map(Topic::getId)
+                .map(mt -> mt.getTopic().getId())
                 .toList();
-
         if (topicIds.isEmpty()) return java.util.Collections.emptyMap();
 
         List<OldestPerTopicProjection> oldestList = newsRepository.findOldestPerTopic(topicIds);
-
         return oldestList.stream().collect(
                 java.util.stream.Collectors.toMap(
                         OldestPerTopicProjection::getTopicId,

@@ -16,43 +16,20 @@ import org.springframework.data.repository.query.Param;
 
 public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> {
 
-    // memberTopic 에서 isRead = true 인 것 중, topicName 을 기준으로 keyword 검색 & 커서 페이지네이션 구현
     @Query("""
-    SELECT mt.topic FROM MemberTopic mt
-    WHERE mt.member.id = :memberId
-      AND mt.isRead = true
-      AND (:keyword IS NULL OR LOWER(mt.topic.topicName) LIKE CONCAT('%', LOWER(:keyword), '%'))
-      AND (:cursor IS NULL OR mt.topic.id < :cursor)
-    ORDER BY mt.topic.id DESC
-""")
-    Slice<Topic> searchReadTopicsByKeyword(
+        select mt
+          from MemberTopic mt
+          join fetch mt.topic t
+         where mt.member.id = :memberId
+           and mt.isRead = true
+           and (:cursor is null or t.id < :cursor)
+         order by t.id desc
+    """)
+    Slice<MemberTopic> getReadWithTopic(
             @Param("memberId") Long memberId,
-            @Param("keyword") String keyword,
             @Param("cursor") Long cursor,
             Pageable pageable
     );
-
-    @Query("""
-    select t
-    from MemberTopic mt
-    join fetch mt.topic t
-    where mt.member.id = :memberId
-      and mt.isRead = true
-      and (:cursor is null or t.id < :cursor)
-    order by t.id desc
-    """)
-    Slice<Topic> getReadTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
-
-    @Query("""
-    select t
-    from MemberTopic mt
-    join fetch mt.topic t
-    where mt.member.id = :memberId
-      and mt.isSubscribe = true
-      and (:cursor is null or t.id < :cursor)
-    order by t.id desc
-    """)
-    Slice<Topic> getSubscriptionTopicsByMemberId(@Param("memberId") Long memberId, @Param("cursor") Long cursor, Pageable pageable);
 
     Optional<MemberTopic> findByMemberIdAndTopicId(Long memberId, Long topicId);
 
@@ -77,10 +54,11 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
     // 해당 토픽을 읽은 멤버 조회
     @Query("""
         SELECT mt.member.id
-        FROM MemberTopic mt
-        WHERE mt.topic.id IN :topicId AND mt.isRead = true
+          FROM MemberTopic mt
+         WHERE mt.topic.id = :topicId AND mt.isRead = true
     """)
-    List<Long> findReadMemberIdsByTopicId(Long topicId);
+    List<Long> findReadMemberIdsByTopicId(@Param("topicId") Long topicId);
+
 
     @Query("""
     select mt.topic.id
@@ -91,6 +69,40 @@ public interface MemberTopicRepository extends JpaRepository<MemberTopic, Long> 
 """)
     List<Long> findSubscribedTopicIdsByMemberAndTopicIds(@Param("memberId") Long memberId,
                                                          @Param("topicIds") List<Long> topicIds);
+
+    // 구독 목록
+    @Query("""
+        select mt
+          from MemberTopic mt
+          join fetch mt.topic t
+         where mt.member.id = :memberId
+           and mt.isSubscribe = true
+           and (:cursor is null or t.id < :cursor)
+         order by t.id desc
+    """)
+    Slice<MemberTopic> findSubscribedWithTopic(
+            @Param("memberId") Long memberId,
+            @Param("cursor") Long cursor,
+            Pageable pageable
+    );
+
+    // 읽은 목록
+    @Query("""
+        select mt
+          from MemberTopic mt
+          join fetch mt.topic t
+         where mt.member.id = :memberId
+           and mt.isRead = true
+           and (:keyword is null or lower(t.topicName) like concat('%', lower(:keyword), '%'))
+           and (:cursor is null or t.id < :cursor)
+         order by t.id desc
+    """)
+    Slice<MemberTopic> searchReadWithTopic(
+            @Param("memberId") Long memberId,
+            @Param("keyword") String keyword,
+            @Param("cursor") Long cursor,
+            Pageable pageable
+    );
 
     boolean existsByMemberIdAndTopicIdAndIsSubscribeTrue(Long memberId, Long topicId);
 }
