@@ -1,6 +1,11 @@
 package UMC.news.newsIntelligent.domain.member.service;
 
 import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
+import UMC.news.newsIntelligent.domain.topic.entity.Topic;
+import org.springframework.data.domain.Slice;
+
+import java.util.List;
+import java.util.Map;
 
 public interface MemberTopicQueryService {
 

@@ -6,12 +6,16 @@ import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.domain.topic.service.query.TopicQueryService;
 import UMC.news.newsIntelligent.global.apiPayload.CustomResponse;
 import UMC.news.newsIntelligent.global.apiPayload.code.success.SuccessCode;
+import UMC.news.newsIntelligent.global.config.security.PrincipalUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.file.attribute.UserPrincipal;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,8 +31,12 @@ public class NewsController {
             @ApiResponse(responseCode = "200", description = "토픽 상세 페이지 조회 성공")
     })
     @GetMapping("/{topicId}")
-    public CustomResponse<TopicResponseDTO.TopicPreviewResDTO> getTopicDetails(@PathVariable Long topicId){
-        TopicResponseDTO.TopicPreviewResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId);
+    public CustomResponse<TopicResponseDTO.TopicPreviewResDTO> getTopicDetails(
+            @PathVariable Long topicId,
+            @AuthenticationPrincipal PrincipalUserDetails principal
+            ){
+        Long memberId = (principal == null) ? null : principal.getMemberId();
+        TopicResponseDTO.TopicPreviewResDTO topicDetailsDTO = topicQueryService.getTopicById(topicId, memberId);
         return CustomResponse.onSuccess(SuccessCode.GET_TOPIC, topicDetailsDTO);
     }
 
@@ -51,8 +59,11 @@ public class NewsController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토픽 출처 기사 목록 조회 성공")
     })
     @GetMapping("/latest")
-    public CustomResponse<NewsResponseDTO.TopicQualifiedListResDTO> getLatestTopic() {
-        NewsResponseDTO.TopicQualifiedListResDTO latestTopicNews = newsQueryServiceImpl.getLatestTopicNews();
+    public CustomResponse<NewsResponseDTO.TopicQualifiedListResDTO> getLatestTopic(
+            @AuthenticationPrincipal PrincipalUserDetails principal
+    ) {
+        Long memberId = (principal == null) ? null : principal.getMemberId();
+        NewsResponseDTO.TopicQualifiedListResDTO latestTopicNews = newsQueryServiceImpl.getLatestTopicNews(memberId);
         return CustomResponse.onSuccess(SuccessCode.GET_LATEST_TOPIC, latestTopicNews);
     }
 

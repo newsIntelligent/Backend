@@ -4,9 +4,9 @@ import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
 import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 
 public interface TopicQueryService {
-    TopicResponseDTO.TopicPreviewListResDTO searchTopics(String keyword, Long cursor, int size);
+    TopicResponseDTO.TopicPreviewListResDTO searchTopics(String keyword, Long cursor, int size, Long memberId);
 
-    TopicResponseDTO.TopicPreviewListResDTO getTopicList(Long cursor, int size);
+    TopicResponseDTO.TopicPreviewListResDTO getTopicList(Long cursor, int size, Long memberId);
 
-    TopicResponseDTO.TopicPreviewResDTO getTopicById(Long topicId);
+    TopicResponseDTO.TopicPreviewResDTO getTopicById(Long topicId, Long memberId);
 }
