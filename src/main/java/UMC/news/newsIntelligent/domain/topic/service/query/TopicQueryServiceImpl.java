@@ -125,7 +125,7 @@ public class TopicQueryServiceImpl implements TopicQueryService {
                         p -> TopicResponseDTO.ImageSource.builder()
                                 .press(p.getPress())
                                 .title(p.getTitle())
-                                .url(p.getNewsLink())
+                                .newsLink(p.getNewsLink())
                                 .build(),
                         (a, b) -> a
                 )
