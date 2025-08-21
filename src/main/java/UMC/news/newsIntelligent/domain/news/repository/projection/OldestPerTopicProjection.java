@@ -4,4 +4,5 @@ public interface OldestPerTopicProjection {
     Long getTopicId();
     String getPress();
     String getTitle();
+    String getNewsLink();
 }
