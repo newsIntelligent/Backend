@@ -103,8 +103,8 @@ public interface NewsRepository extends JpaRepository<News, Long> {
             org.springframework.data.domain.Pageable pageable
     );
 
-    // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 큰 기사
-    Optional<News> findFirstByTopicIdOrderByPublishDateAscIdDesc(Long topicId);
+    // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 작은 기사
+    Optional<News> findFirstByTopicIdOrderByPublishDateAscIdAsc(Long topicId);
 }
 
 

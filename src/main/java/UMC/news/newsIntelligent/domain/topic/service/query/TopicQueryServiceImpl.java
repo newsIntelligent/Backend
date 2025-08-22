@@ -84,7 +84,7 @@ public class TopicQueryServiceImpl implements TopicQueryService {
         Topic topic = topicRepository.findById(topicId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TOPIC_NOT_FOUND));
 
-        News source = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId).orElse(null);
+        News source = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdAsc(topicId).orElse(null);
 
         TopicResponseDTO.ImageSource imageSource = (source == null) ? null
                 : TopicResponseDTO.ImageSource.builder()
