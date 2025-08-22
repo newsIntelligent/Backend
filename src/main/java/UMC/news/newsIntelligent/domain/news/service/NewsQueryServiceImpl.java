@@ -103,7 +103,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                     NewsConverter.toRelatedDtos(top3);
 
             // 출처 기사 (가장 오래된 기사 + id DESC)
-            var sourceOpt = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdDesc(topicId);
+            var sourceOpt = newsRepository.findFirstByTopicIdOrderByPublishDateAscIdAsc(topicId);
             NewsResponseDTO.ImageSource imageSource = sourceOpt
                     .map(n -> NewsResponseDTO.ImageSource.builder()
                             .press(n.getPress())
