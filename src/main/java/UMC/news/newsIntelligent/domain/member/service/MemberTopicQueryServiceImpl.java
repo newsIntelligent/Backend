@@ -4,11 +4,9 @@ import UMC.news.newsIntelligent.domain.member.converter.MemberTopicConverter;
 import UMC.news.newsIntelligent.domain.member.dto.MemberTopicResponseDTO;
 import UMC.news.newsIntelligent.domain.member.entity.MemberTopic;
 import UMC.news.newsIntelligent.domain.member.repository.MemberTopicRepository;
-import UMC.news.newsIntelligent.domain.member.support.TopicQueryUtils;
 import UMC.news.newsIntelligent.domain.news.repository.NewsRepository;
 import UMC.news.newsIntelligent.domain.news.repository.projection.OldestPerTopicProjection;
 import UMC.news.newsIntelligent.domain.topic.dto.TopicResponseDTO;
-import UMC.news.newsIntelligent.domain.topic.entity.Topic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -87,6 +85,7 @@ public class MemberTopicQueryServiceImpl implements MemberTopicQueryService {
                         p -> TopicResponseDTO.ImageSource.builder()
                                 .press(p.getPress())
                                 .title(p.getTitle())
+                                .newsLink(p.getNewsLink())
                                 .build(),
                         (a, b) -> a
                 )

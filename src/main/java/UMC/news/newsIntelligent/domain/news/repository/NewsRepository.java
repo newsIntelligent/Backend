@@ -56,21 +56,24 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     List<News> findTop3QualifiedNewsByTopicId(@Param("topicId") Long topicId);
 
     @Query("""
-SELECT n.topic.id AS topicId, n.press AS press, n.title AS title
-FROM News n
-WHERE n.topic.id IN :topicIds
-  AND n.publishDate = (
-      SELECT MIN(n2.publishDate)
-      FROM News n2
-      WHERE n2.topic.id = n.topic.id
-  )
-  AND n.id = (
-      SELECT MAX(n3.id)
-      FROM News n3
-      WHERE n3.topic.id = n.topic.id
-        AND n3.publishDate = n.publishDate
-  )
-""")
+    SELECT n.topic.id AS topicId, 
+            n.press AS press,
+            n.title AS title,
+            n.newsLink AS newsLink 
+    FROM News n
+    WHERE n.topic.id IN :topicIds
+      AND n.publishDate = (
+          SELECT MIN(n2.publishDate)
+          FROM News n2
+          WHERE n2.topic.id = n.topic.id
+      )
+      AND n.id = (
+          SELECT MAX(n3.id)
+          FROM News n3
+          WHERE n3.topic.id = n.topic.id
+            AND n3.publishDate = n.publishDate
+      )
+    """)
     List<OldestPerTopicProjection> findOldestPerTopic(java.util.Collection<Long> topicIds);
 
     // is_new = true AND is_third = false 인 기사 중
@@ -103,21 +106,5 @@ WHERE n.topic.id IN :topicIds
     // 특정 토픽 내에서 가장 오래된 publishDate, id가 가장 큰 기사
     Optional<News> findFirstByTopicIdOrderByPublishDateAscIdDesc(Long topicId);
 }
-//    @Query(value = """
-//    SELECT n.*
-//    FROM news n
-//    JOIN (
-//        SELECT topic_id
-//        FROM news
-//        WHERE is_new = 1
-//          AND is_third = 0
-//        GROUP BY topic_id
-//        HAVING COUNT(*) >= 3
-//        ORDER BY COUNT(*) DESC, MAX(id) DESC   -- 동률이면 id 큰 토픽 우선
-//        LIMIT 1
-//    ) t ON t.topic_id = n.topic_id
-//    WHERE n.is_new = 1
-//      AND n.is_third = 0
-//    """, nativeQuery = true)
-//    List<News> findArticlesOfTopTopicByCount();
+
 
