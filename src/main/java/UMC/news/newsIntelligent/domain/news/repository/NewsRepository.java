@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,25 +57,25 @@ public interface NewsRepository extends JpaRepository<News, Long> {
     List<News> findTop3QualifiedNewsByTopicId(@Param("topicId") Long topicId);
 
     @Query("""
-    SELECT n.topic.id AS topicId, 
-            n.press AS press,
-            n.title AS title,
-            n.newsLink AS newsLink 
-    FROM News n
-    WHERE n.topic.id IN :topicIds
-      AND n.publishDate = (
-          SELECT MIN(n2.publishDate)
-          FROM News n2
-          WHERE n2.topic.id = n.topic.id
-      )
-      AND n.id = (
-          SELECT MAX(n3.id)
-          FROM News n3
-          WHERE n3.topic.id = n.topic.id
-            AND n3.publishDate = n.publishDate
-      )
-    """)
-    List<OldestPerTopicProjection> findOldestPerTopic(java.util.Collection<Long> topicIds);
+SELECT n.topic.id AS topicId, 
+       n.press     AS press,
+       n.title     AS title,
+       n.newsLink  AS newsLink 
+FROM News n
+WHERE n.topic.id IN :topicIds
+  AND n.publishDate = (
+      SELECT MIN(n2.publishDate)
+      FROM News n2
+      WHERE n2.topic.id = n.topic.id
+  )
+  AND n.id = (
+      SELECT MIN(n3.id)
+      FROM News n3
+      WHERE n3.topic.id   = n.topic.id
+        AND n3.publishDate = n.publishDate
+  )
+""")
+    List<OldestPerTopicProjection> findOldestPerTopic(Collection<Long> topicIds);
 
     // is_new = true AND is_third = false 인 기사 중
     // 아직 어떤 run에서도 LatestCorrectionItem 에 기록되지 않은 것만
