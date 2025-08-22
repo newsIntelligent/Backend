@@ -1,5 +1,6 @@
 package UMC.news.newsIntelligent.domain.dailyReport;
 
+import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class DailyReportTopicsJpaAdapter implements DailyReportTopicsPort {
 		// 구독 섹션에 들어간 토픽 id 수집(중복 방지)
 		List<DailyReportEmailTemplate.TopicCard> subscribed = loadSubScribedUpdateCards(member);
 		Set<Long> excludeIds = subscribed.stream()
-			.map(DailyReportEmailTemplate.TopicCard::linkUrl) // "/topics/{id}" 에서 id만 뽑아내는 대신, 안전하게 다시 조회
+			.map(DailyReportEmailTemplate.TopicCard::linkUrl) // "/article?id={id}" 에서 id만 뽑아내는 대신, 안전하게 다시 조회
 			.map(this::extractIdFromLinkOrReturnMinusOne)
 			.filter(id -> id > 0)
 			.collect(Collectors.toSet());
@@ -66,7 +67,11 @@ public class DailyReportTopicsJpaAdapter implements DailyReportTopicsPort {
 	/** Topic -> TopicCard 매핑 */
 	private DailyReportEmailTemplate.TopicCard toCard(Topic t) {
 		String base = mailService.getFrontBaseUrl();
-		String link = base + "/topics/" + t.getId();
+		String baseNorm = (base != null && base.endsWith("/")) ? base.substring(0, base.length() - 1) : base;
+
+		// 토픽 상세페이지 링크 형식: /article?id={id}
+		String link = baseNorm + "/article?id=" + t.getId();
+
 		String meta = "업데이트 " + META_TIME_FMT.format(t.getSummaryTime());
 		String title = t.getTopicName();
 		String summary = safeSummary(t);
@@ -83,19 +88,21 @@ public class DailyReportTopicsJpaAdapter implements DailyReportTopicsPort {
 	}
 
 	/**
-	 * 링크에서 "/topics/{id}" 형태의 id를 추출
+	 * id 추출 로직
+	 * 링크에서 "/article?id={id}" 쿼리 파라미터인 id를 추출
 	 * 추출 실패 시 -1 반환.
 	 */
 	private long extractIdFromLinkOrReturnMinusOne(String link) {
-		if (link == null) return -1;
-		int idx = link.lastIndexOf("/topics/");
-		if (idx < 0) return -1;
-		String tail = link.substring(idx + "/topics/".length());
-		int q = tail.indexOf('?');
-		String idStr = (q >= 0) ? tail.substring(0, q) : tail;
+		if (link == null || link.isBlank()) return -1;
 		try {
+			URI uri = URI.create(link);
+			String query = uri.getRawQuery();
+			if(query == null) return -1;
+			if(!query.startsWith("id=")) return -1;
+
+			String idStr = query.substring(3);
 			return Long.parseLong(idStr);
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
 			return -1;
 		}
 	}
