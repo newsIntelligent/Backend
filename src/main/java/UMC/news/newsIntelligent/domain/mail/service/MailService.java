@@ -27,7 +27,7 @@ public class MailService {
 
     @Value("${spring.mail.username}") private String from;
     @Value("${server.host.front}") private String frontUrl;
-    @Value("${server.host.api}") private String apiUrl;
+    private String apiUrl = "https://api.newsintelligent.site";
 
     public String getFrontBaseUrl() { return baseUrl(); }
 
@@ -52,8 +52,8 @@ public class MailService {
         String path = (type == OtpCode.Type.SIGNUP)
                 ? "/api/members/signup/magic"
                 : "/api/members/login/magic";
-        String link = baseUrl() + path + "?token=" +
-                URLEncoder.encode(token, StandardCharsets.UTF_8);
+
+        String link = apiUrl + path + "?token=" + URLEncoder.encode(token, StandardCharsets.UTF_8);
 
         String html = EmailHtmlTemplate.renderOtp(hyphenateCode(code), link);
         sendHtml(to, "[NewsIntelligent] 이메일 주소 확인", html);

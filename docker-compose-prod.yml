@@ -22,6 +22,7 @@ services:
       SECURITY_JWT_EXPIRATION_ACCESS: ${JWT_EXPIRATION_ACCESS:-14400000}
 
       SERVER_HOST_FRONT: https://newsintelligent.site
+      SERVER_HOST_API: https://api.newsintelligent.site
 
       # JVM/Pool 안전장치
       JAVA_TOOL_OPTIONS: >-
