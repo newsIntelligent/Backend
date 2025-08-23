@@ -62,6 +62,7 @@ public class NewsResponseDTO {
     @Builder
     public record ImageSource(
             String press,
-            String title
+            String title,
+            String newsLink
     ) {}
 }
