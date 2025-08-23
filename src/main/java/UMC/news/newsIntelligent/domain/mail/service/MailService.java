@@ -5,7 +5,6 @@ import UMC.news.newsIntelligent.domain.mail.entity.OtpCode;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +12,9 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ public class MailService {
 
     @Value("${spring.mail.username}") private String from;
     @Value("${server.host.front}") private String frontUrl;
+    @Value("${server.host.api}") private String apiUrl;
 
     public String getFrontBaseUrl() { return baseUrl(); }
 
@@ -45,10 +48,13 @@ public class MailService {
         return b.endsWith("/") ? b.substring(0, b.length() - 1) : b;
     }
 
-
     public void sendOtpMail(String to, String code, String token, OtpCode.Type type) {
-        String path  = (type == OtpCode.Type.SIGNUP) ? "/signup/magic" : "/login/magic";
-        String link = baseUrl() + path + "?token=" + token;
+        String path = (type == OtpCode.Type.SIGNUP)
+                ? "/api/members/signup/magic"
+                : "/api/members/login/magic";
+        String link = baseUrl() + path + "?token=" +
+                URLEncoder.encode(token, StandardCharsets.UTF_8);
+
         String html = EmailHtmlTemplate.renderOtp(hyphenateCode(code), link);
         sendHtml(to, "[NewsIntelligent] 이메일 주소 확인", html);
     }
