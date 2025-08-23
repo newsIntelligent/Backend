@@ -90,6 +90,7 @@ public class TopicQueryServiceImpl implements TopicQueryService {
                 : TopicResponseDTO.ImageSource.builder()
                 .press(source.getPress())
                 .title(source.getTitle())
+                .newsLink(source.getNewsLink())
                 .build();
 
         boolean isSub = false; // 기본 false (비로그인)

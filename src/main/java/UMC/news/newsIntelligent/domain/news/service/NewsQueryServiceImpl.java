@@ -108,6 +108,7 @@ public class NewsQueryServiceImpl implements NewsQueryService{
                     .map(n -> NewsResponseDTO.ImageSource.builder()
                             .press(n.getPress())
                             .title(n.getTitle())
+                            .newsLink(n.getNewsLink())
                             .build())
                     .orElse(null);
 
